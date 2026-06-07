@@ -634,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4.6 · 2026-06-07 21:36 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4.7 · 2026-06-07 21:38 UTC</span>
   </div>
 </div>
 
@@ -1395,7 +1395,7 @@ async function sbGet(id) {
   try {
     const res = await fetch(`${SB_URL}/rest/v1/command_center?id=eq.${encodeURIComponent(id)}&select=data`, {
       method: 'GET',
-      headers: new Headers({ 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY })
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
     });
     if (!res.ok) { console.warn('sbGet error:', res.status); return null; }
     const rows = await res.json();
@@ -1407,12 +1407,12 @@ async function sbSet(id, payload) {
   try {
     const res = await fetch(`${SB_URL}/rest/v1/command_center`, {
       method: 'POST',
-      headers: new Headers({
+      headers: {
         'Content-Type': 'application/json',
         'apikey': SB_KEY,
         'Authorization': 'Bearer ' + SB_KEY,
         'Prefer': 'resolution=merge-duplicates'
-      }),
+      },
       body: JSON.stringify({ id, data: payload, updated_at: new Date().toISOString() })
     });
     if (!res.ok) { const t = await res.text(); console.error('sbSet error:', res.status, t); }
