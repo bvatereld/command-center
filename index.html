@@ -618,7 +618,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .triage-toggle.active{background:var(--gold)!important;color:#0d0f14!important;border-color:var(--gold)!important;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body id="artifacts-component-root-html">
 
@@ -635,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4.5 · 2026-06-07 21:32 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4.6 · 2026-06-07 21:36 UTC</span>
   </div>
 </div>
 
@@ -1392,23 +1391,31 @@ function createDraggableTask(label, meta, zone) {
 const STORAGE_KEY = 'cmo_cc_state_v18';
 const SB_URL = 'https://wvwvdxyeknndspxjviyo.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2d3ZkeHlla25uZHNweGp2aXlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NTU4OTUsImV4cCI6MjA5NDIzMTg5NX0.2XvG_8JTEzOMr3FegBc-4B_v0qtBrqBlqU_eFQMQ36w';
-const _sb = supabase.createClient(SB_URL, SB_KEY, {
-  global: { fetch: fetch.bind(globalThis) },
-  auth: { persistSession: false }
-});
-
 async function sbGet(id) {
   try {
-    const { data, error } = await _sb.from('command_center').select('data').eq('id', id).single();
-    if (error) { console.warn('sbGet error:', error.message); return null; }
-    return data?.data || null;
+    const res = await fetch(`${SB_URL}/rest/v1/command_center?id=eq.${encodeURIComponent(id)}&select=data`, {
+      method: 'GET',
+      headers: new Headers({ 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY })
+    });
+    if (!res.ok) { console.warn('sbGet error:', res.status); return null; }
+    const rows = await res.json();
+    return rows?.[0]?.data || null;
   } catch(e) { console.warn('sbGet failed:', e); return null; }
 }
 
 async function sbSet(id, payload) {
   try {
-    const { error } = await _sb.from('command_center').upsert({ id, data: payload, updated_at: new Date().toISOString() });
-    if (error) console.error('sbSet error:', error.message);
+    const res = await fetch(`${SB_URL}/rest/v1/command_center`, {
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Prefer': 'resolution=merge-duplicates'
+      }),
+      body: JSON.stringify({ id, data: payload, updated_at: new Date().toISOString() })
+    });
+    if (!res.ok) { const t = await res.text(); console.error('sbSet error:', res.status, t); }
     else console.log('Supabase write OK:', id);
   } catch(e) { console.error('sbSet failed:', e); }
 }
