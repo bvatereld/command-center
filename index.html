@@ -400,6 +400,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .waiting-tag{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(247,144,68,.12);color:var(--orange);margin-top:4px;}
 .zone-active-waiting{background:rgba(247,144,68,.04);}
 
+
+/* TASK NOTES & SUBTASKS */
+.task-expand-bar{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.task-expand-btn{background:var(--surface2)!important;border:1px solid var(--border)!important;cursor:pointer;font-size:10px;color:var(--text3);padding:2px 8px;border-radius:4px;transition:all .12s;font-family:'DM Mono',monospace;line-height:1.4;white-space:nowrap;}
+.task-expand-btn:hover{color:var(--accent);border-color:var(--accent)!important;}
+.task-expand-btn.has-content{color:var(--accent);border-color:rgba(79,142,247,.4)!important;}
+.task-notes-area{margin-top:6px;padding:8px 10px;background:rgba(79,142,247,.04);border-left:2px solid var(--border2);border-radius:0 5px 5px 0;display:none;}
+.task-notes-area.open{display:block;}
+.task-notes-input{width:100%;background:var(--surface2)!important;border:1px solid var(--border)!important;border-radius:5px;padding:6px 8px;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text)!important;line-height:1.6;resize:vertical;min-height:52px;color-scheme:dark;}
+.task-notes-input::placeholder{color:var(--text3)!important;}
+.task-subtasks{margin-top:6px;display:none;}
+.task-subtasks.open{display:block;}
+.task-subtask-item{display:flex;align-items:center;gap:7px;padding:3px 0;}
+.task-subtask-cb{width:13px;height:13px;border:1.5px solid var(--border2);border-radius:3px;flex-shrink:0;cursor:pointer;appearance:none;background:transparent;position:relative;transition:all .12s;}
+.task-subtask-cb:checked{background:var(--green);border-color:var(--green);}
+.task-subtask-cb:checked::after{content:'';position:absolute;left:2px;top:0;width:4px;height:7px;border:1.5px solid white;border-top:none;border-left:none;transform:rotate(45deg);}
+.task-subtask-label{font-size:12.5px;color:var(--text2);flex:1;outline:none;background:transparent;border:none;}
+.task-subtask-item:has(.task-subtask-cb:checked) .task-subtask-label{text-decoration:line-through;color:var(--text3);opacity:.6;}
+.task-subtask-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:0 3px;opacity:0;transition:opacity .12s;}
+.task-subtask-item:hover .task-subtask-del{opacity:1;}
+.task-subtask-del:hover{color:var(--red);}
+.task-add-subtask{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.task-add-subtask-input{flex:1;background:transparent;border:none;border-bottom:1px dashed var(--border2);outline:none;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;padding:2px 0;color-scheme:dark;}
+.task-add-subtask-input::placeholder{color:var(--text3);}
+.task-add-subtask-input:focus{border-bottom-color:var(--accent);}
+
+/* CMO ITEM REVIEW */
+.cmo-item-wrap{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:1px 0;}
+.cmo-item-wrap .cmo-item{flex:1;margin:0;padding:0;}
+.cmo-item-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s;flex-shrink:0;}
+.cmo-box:hover .cmo-item-actions{opacity:1;}
+.cmo-item-keep{padding:2px 7px;border-radius:4px;border:1px solid rgba(62,207,142,.3);background:transparent;color:var(--green);font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .12s;}
+.cmo-item-keep:hover{background:rgba(62,207,142,.15);}
+.cmo-item-drop{padding:2px 7px;border-radius:4px;border:1px solid rgba(247,111,114,.3);background:transparent;color:var(--red);font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .12s;}
+.cmo-item-drop:hover{background:rgba(247,111,114,.15);}
+
 /* WAITING MODAL */
 .waiting-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center;}
 .waiting-modal.open{display:flex;}
@@ -561,6 +597,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr;}.main{padding:12px;}}
+
+/* ── TRIAGE MODE ── */
+.triage-mode-active .task-item.draggable.triaged{opacity:0;height:0;padding:0;border:none;overflow:hidden;}
+.triage-actions-wrap{display:none;align-items:center;gap:4px;margin-left:auto;flex-shrink:0;}
+.triage-mode-active .triage-actions-wrap{display:flex;}
+.triage-mode-active .age-badge{display:none;}
+.triage-mode-active .task-expand-bar{display:none;}
+.tr-pill{display:inline-block;padding:3px 10px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border:1px solid;background:var(--surface2)!important;color:var(--text2)!important;transition:all .12s;white-space:nowrap;line-height:1.6;}
+.tr-pill.keep{border-color:rgba(62,207,142,.5)!important;color:var(--green)!important;background:rgba(62,207,142,.08)!important;}.tr-pill.keep:hover{background:rgba(62,207,142,.2)!important;}
+.tr-pill.move-today{border-color:rgba(247,111,114,.5)!important;color:var(--red)!important;background:rgba(247,111,114,.08)!important;}.tr-pill.move-today:hover{background:rgba(247,111,114,.2)!important;}
+.tr-pill.move-week{border-color:rgba(79,142,247,.5)!important;color:var(--accent)!important;background:rgba(79,142,247,.08)!important;}.tr-pill.move-week:hover{background:rgba(79,142,247,.2)!important;}
+.tr-pill.move-later{border-color:rgba(124,106,247,.5)!important;color:var(--accent2)!important;background:rgba(124,106,247,.08)!important;}.tr-pill.move-later:hover{background:rgba(124,106,247,.2)!important;}
+.tr-pill.del{border-color:rgba(247,111,114,.3)!important;color:var(--red)!important;background:var(--surface2)!important;opacity:.7;}.tr-pill.del:hover{opacity:1;background:rgba(247,111,114,.15)!important;}
+.triage-bar{display:none;align-items:center;justify-content:space-between;padding:8px 16px;background:rgba(245,200,66,.06);border-top:1px solid rgba(245,200,66,.2);}
+.triage-bar.visible{display:flex;}
+.triage-progress{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+.triage-toggle{padding:6px 14px;border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;border:1px solid rgba(245,200,66,.5)!important;background:var(--surface)!important;color:var(--gold)!important;transition:all .15s;}
+.triage-toggle:hover{background:rgba(245,200,66,.1)!important;}
+.triage-toggle.active{background:var(--gold)!important;color:#0d0f14!important;border-color:var(--gold)!important;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
@@ -578,7 +633,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="date-chip" id="week-label">Week of May 12, 2026</div>
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
-    <button class="tb-btn" onclick="exportZip()" style="opacity: 0.6; pointer-events: none;">⏳ Backing up...</button>
+    <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
   </div>
 </div>
 
@@ -613,6 +668,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="card-title">My Priorities</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">⠿ drag to reorder</div>
+            <button class="triage-toggle" onclick="toggleTriageMode()" id="triage-toggle-btn">⚡ Triage</button>
             <div class="card-count" id="prio-count">20 tasks</div>
           </div>
         </div>
@@ -689,6 +745,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <button class="quick-add-cancel" onclick="closeQuickAdd('long')">✕</button>
           </div>
         </div>
+        <div class="triage-bar" id="triage-bar"><div class="triage-progress" id="triage-progress-label">0 of 0 tasks reviewed</div><button class="triage-toggle active" onclick="toggleTriageMode()">✓ Done Triaging</button></div>
         <div id="done-section" style="display: block; border-top: 1px solid var(--border);">
           <div class="done-header" onclick="toggleDone()">
             <div style="display:flex;align-items:center;gap:8px;">
@@ -746,7 +803,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">01</span><span class="prio-title">Creator Priority</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Mt. Death push</div><div class="sub1">· Check in on co-posting status with retailer</div><div class="sub1">· June creator planning</div></div></div>
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">02</span><span class="prio-title">Mt. Death Organic Push</span></div></div>
       </div>
-      <div class="cmo-box"><div class="cmo-label">CMO Focus for Nick</div><div class="cmo-item">Confirm top 5 priorities on return</div><div class="cmo-item">Review search performance on Amazon &amp; Walmart</div><div class="cmo-item">PDPV Report</div><div class="cmo-item">C Store Social UGC Content</div></div>
+      <div class="cmo-box"><div class="cmo-label">CMO Focus for Nick</div><div class="cmo-item-wrap">
+              <div class="cmo-item">Confirm top 5 priorities on return</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Review search performance on Amazon &amp; Walmart</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">PDPV Report</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">C Store Social UGC Content</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div></div>
     <div class="team-waiting-section" style="margin: 0px 16px 14px; padding: 10px 12px; background: rgba(247, 144, 68, 0.06); border: 1px solid rgba(247, 144, 68, 0.2); border-radius: 7px;"><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--orange);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">⏳ Waiting on Nick</div><div style="font-size:12px;color:var(--text2);padding:2px 0;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:var(--orange);">·</span>NY UGC Push</div><div style="font-size:12px;color:var(--text2);padding:2px 0;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:var(--orange);">·</span>Walmart funnel strategy — move dollars down funnel with CDPV focus + push Search, mirroring Amazon approach</div></div></div>
     <!-- ANDREW -->
     <div class="team-card">
@@ -760,7 +841,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">05</span><span class="prio-title">Amazon Performance</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Replicate Energy offsite keywords strategy across FSW, Iced Tea &amp; OGs Contextual campaigns</div><div class="sub1">· Monitor FSW &amp; OGs Non-SnS Purchasers Loyalty audience — strong SnS conversion efficiency</div></div></div>
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">06</span><span class="prio-title">Walmart DSS Performance</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Monitor DSS pacing: Brand Retargeting (FSW &amp; Iced Tea) + OGs Contextual summer tentpole</div><div class="sub1">· Maintain Walmart Energy strategy — efficiency improved, no immediate action</div><div class="sub1">· Move dollars to Search from Energy onsite campaigns</div></div></div>
       </div>
-      <div class="cmo-box"><div class="cmo-label">CMO Focus for Andrew</div><div class="cmo-item">Monitor Platform / Data / Feature / Audience fees across all CTV</div><div class="cmo-item">Automate CTV fee tracking with Shane</div><div class="cmo-item">Conversion campaign growth</div><div class="cmo-item">Test Circana in category specific audience</div><div class="cmo-item">Kick off Yahoo DSP</div></div>
+      <div class="cmo-box"><div class="cmo-label">CMO Focus for Andrew</div><div class="cmo-item-wrap">
+              <div class="cmo-item">Monitor Platform / Data / Feature / Audience fees across all CTV</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Automate CTV fee tracking with Shane</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Conversion campaign growth</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Test Circana in category specific audience</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Kick off Yahoo DSP</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div></div>
     </div>
     <!-- STERLING -->
     <div class="team-card">
@@ -774,7 +885,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num te">05</span><span class="prio-title">SC Update — Storefinder / PDP Options</span></div></div>
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num te">06</span><span class="prio-title">CRM Affinity</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Build a roadmap based on the analysis</div></div></div>
       </div>
-      <div class="cmo-box"><div class="cmo-label">CMO Focus for Sterling</div><div class="cmo-item">Finalize CRM audit and share with CMO — ASAP</div><div class="cmo-item">Wing Campaign — all links &amp; landing pages tested for Deadly Water</div><div class="cmo-item">Amplify CRM data with Affinity — beverage category + retailer</div></div>
+      <div class="cmo-box"><div class="cmo-label">CMO Focus for Sterling</div><div class="cmo-item-wrap">
+              <div class="cmo-item">Finalize CRM audit and share with CMO — ASAP</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Wing Campaign — all links &amp; landing pages tested for Deadly Water</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Amplify CRM data with Affinity — beverage category + retailer</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div></div>
     </div>
   <div id="external-waiting-card" class="team-card team-waiting-section"><div class="tp-header" style="background:rgba(247,144,68,.06);border-bottom:1px solid rgba(247,144,68,.2);"><div style="width:36px;height:36px;border-radius:8px;background:rgba(247,144,68,.15);display:flex;align-items:center;justify-content:center;font-size:18px;">⏳</div><div class="p-info"><div class="p-name">External</div><div class="p-role">Waiting on others</div></div></div><div style="padding:12px 16px;"><div style="margin-bottom:8px;"><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--orange);margin-bottom:4px;">Christine H</div><div style="font-size:12px;color:var(--text2);padding:1px 0;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:var(--orange);">·</span>Plan Podcast in NYC</div></div></div></div></div>
 </div>
@@ -785,15 +914,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="card">
       <div class="card-header"><div class="card-title">📥 Triage Queue</div><div class="card-count" id="inbox-count">0 items</div></div>
       <div class="triage-wrap">
-        <div class="triage-label">Capture — then route it</div>
+        <div class="triage-label">Capture — tag it, push to priorities when ready</div>
         <textarea class="triage-ta" id="triageInput" placeholder="Dump a thought, task, follow-up, or blocker..."></textarea>
         <div class="triage-actions">
-          <button class="tr-btn t" onclick="routeInbox('today')">→ Today</button>
-          <button class="tr-btn w" onclick="routeInbox('week')">→ This Week</button>
-          <button class="tr-btn l" onclick="routeInbox('longterm')">→ Longer Term</button>
-          <button class="tr-btn tm" onclick="routeInbox('team')">→ Team Item</button>
-          <button class="tr-btn ar" onclick="routeInbox('archive')">Archive</button>
+          <button class="tr-btn t" onclick="tagInbox('today')">🔴 Today</button>
+          <button class="tr-btn w" onclick="tagInbox('week')">🔵 This Week</button>
+          <button class="tr-btn l" onclick="tagInbox('longterm')">🟣 Longer Term</button>
+          <button class="tr-btn tm" onclick="tagInbox('team')">👥 Team Item</button>
+          <button class="tr-btn ar" onclick="tagInbox('archive')">Archive</button>
         </div>
+      </div>
+      <div style="padding:8px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);" id="inbox-tagged-label">Tag items above, then push when ready</div>
+        <button onclick="pushInboxToPriorities()" id="push-btn" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">→ Push to Priorities</button>
       </div>
       <div class="inbox-queue" id="inbox-queue"><div class="inbox-empty-state" id="inbox-empty">Nothing queued yet. Type above or use Brain Dump.</div></div>
     </div>
@@ -1004,12 +1137,13 @@ Heads down. Execute. Let's make $1.4M happen.</textarea>
     <!-- LEFT COLUMN -->
     <div class="col">
       <div class="card">
-        <div class="card-header"><div style="display:flex;align-items:center;gap:8px;"><span>📈</span><div class="card-title">Trackers</div></div><div class="card-count">5 docs</div></div>
+        <div class="card-header"><div style="display:flex;align-items:center;gap:8px;"><span>📈</span><div class="card-title">Trackers</div></div><div class="card-count">6 docs</div></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(62,207,142,.1);">📺</div><div class="doc-info"><div class="doc-title">CTV Tracker</div><div class="doc-meta">Google Sheets · ROAS, Blended ROAS, Frequency</div></div><a class="doc-open" style="color:var(--green);border-color:rgba(62,207,142,.3);" href="https://docs.google.com/spreadsheets/d/1dkkI4Q-HnZpRrq0RAZlu9ireYd7FUo7s7aCRar_t-2I/edit?gid=2114010691#gid=2114010691" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(247,144,68,.1);">🛒</div><div class="doc-info"><div class="doc-title">Walmart Revenue Tracker</div><div class="doc-meta">Google Sheets · Revenue Tracking</div></div><a class="doc-open" style="color:var(--orange);border-color:rgba(247,144,68,.3);" href="https://docs.google.com/spreadsheets/d/1zZiC6lTQudF-kEtqKYZgf8iEMWpf0VgszER-gn_C-K0/edit?gid=1967156172#gid=1967156172" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(79,142,247,.1);">🎯</div><div class="doc-info"><div class="doc-title">Amz Media Model — Weekly Check-in</div><div class="doc-meta">Google Slides · Weekly Review</div></div><a class="doc-open" href="https://docs.google.com/presentation/d/13dk7mZJrEJFad2uOmeagF5B7alB8r3IAiG_nUQOQNcg/edit?slide=id.g3ddd89b6eb5_0_13#slide=id.g3ddd89b6eb5_0_13" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(176,126,247,.1);">🚀</div><div class="doc-info"><div class="doc-title">Amz Movers &amp; Shakers</div><div class="doc-meta">Google Sheets · Amazon Trending Products</div></div><a class="doc-open" style="color:var(--accent2);border-color:rgba(124,106,247,.3);" href="https://docs.google.com/spreadsheets/d/1axiMlpmlengCNCZ_65I24mPKNzAz83_s4mVLuaoxXIc/edit?gid=890692141#gid=890692141" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(245,200,66,.1);">📦</div><div class="doc-info"><div class="doc-title">AMZ PO Weekly Report</div><div class="doc-meta">Google Sheets · Purchase Order Tracking</div></div><a class="doc-open" style="color:var(--gold);border-color:rgba(245,200,66,.3);" href="https://docs.google.com/spreadsheets/d/1CaLIkMI-9Mm3mECEkWedI_jVblzlGraKICiD-jwf_7E/edit?gid=700901681#gid=700901681" target="_blank" rel="noopener">Open ↗</a></div>
+        <div class="doc-row"><div class="doc-icon" style="background:rgba(62,207,142,.1);">📊</div><div class="doc-info"><div class="doc-title">AMZ ASIN Category Tracker</div><div class="doc-meta">Google Sheets · ASIN Category Tracking</div></div><a class="doc-open" style="color:var(--green);border-color:rgba(62,207,142,.3);" href="https://docs.google.com/spreadsheets/d/12GE7LadHU2Xj3Z2OHsx84IUwVzi6RsCWYWyv4-CxQvw/edit?gid=685817387#gid=685817387" target="_blank" rel="noopener">Open ↗</a></div>
       </div>
 
       <div class="card">
@@ -1032,11 +1166,17 @@ Heads down. Execute. Let's make $1.4M happen.</textarea>
       </div>
 
       <div class="card">
-        <div class="card-header"><div style="display:flex;align-items:center;gap:8px;"><span>📂</span><div class="card-title">Reference</div></div><div class="card-count">4 docs</div></div>
+        <div class="card-header"><div style="display:flex;align-items:center;gap:8px;"><span>📂</span><div class="card-title">Reference</div></div><div class="card-count">6 docs</div></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(245,83,79,.1);">📅</div><div class="doc-info"><div class="doc-title">CRM Calendar</div><div class="doc-meta">Asana · Operational Reference</div></div><a class="doc-open" style="color:#f5534f;border-color:rgba(245,83,79,.3);" href="https://app.asana.com/1/1198305039444622/project/1206226793775041/task/1213503385527664" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(45,212,191,.1);">📄</div><div class="doc-info"><div class="doc-title">Courtney Coverage Doc</div><div class="doc-meta">Google Docs · People Reference</div></div><a class="doc-open" style="color:var(--teal);border-color:rgba(45,212,191,.3);" href="https://docs.google.com/document/d/1tWliPbM9FKjZ9ow4TqK9qMlqLlQ3MVKGZcPF_Z5lrg4/edit?tab=t.0" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(62,207,142,.1);">🚀</div><div class="doc-info"><div class="doc-title">AMZ Product Launch Tracker</div><div class="doc-meta">Google Sheets · Product Launch Reference</div></div><a class="doc-open" style="color:var(--green);border-color:rgba(62,207,142,.3);" href="https://docs.google.com/spreadsheets/d/18DU35V75j0TuSu4ZXGrlUHNe8znuDB4Ltulh3Svw-5I/edit?gid=0#gid=0" target="_blank" rel="noopener">Open ↗</a></div>
         <div class="doc-row"><div class="doc-icon" style="background:rgba(245,83,79,.1);">🇧🇷</div><div class="doc-info"><div class="doc-title">Brazil Asana</div><div class="doc-meta">Asana · Brazil Project</div></div><a class="doc-open" style="color:#f5534f;border-color:rgba(245,83,79,.3);" href="https://app.asana.com/1/1198305039444622/project/1214791052403387/list/1214791052889792" target="_blank" rel="noopener">Open ↗</a></div>
+        <div class="doc-row"><div class="doc-icon" style="background:rgba(245,200,66,.1);">📆</div><div class="doc-info"><div class="doc-title">2026 Promo Calendar</div><div class="doc-meta">SharePoint · Retail Marketing Programming</div></div><a class="doc-open" style="color:var(--gold);border-color:rgba(245,200,66,.3);" href="https://liquiddeath.sharepoint.com/:x:/r/sites/FileShare/_layouts/15/Doc.aspx?sourcedoc=%7BD0B75940-BD83-49A5-936B-5C718CB7F4C2%7D&file=2026%20Retail%20Marketing%20Programming_FINAL.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener">Open ↗</a></div>
+        <div class="doc-row"><div class="doc-icon" style="background:rgba(124,106,247,.1);">💡</div><div class="doc-info"><div class="doc-title">2026 Inno Calendar</div><div class="doc-meta">SharePoint · Innovation Calendar</div></div><a class="doc-open" style="color:var(--accent2);border-color:rgba(124,106,247,.3);" href="https://liquiddeath.sharepoint.com/:x:/r/sites/FileShare/_layouts/15/Doc.aspx?sourcedoc=%7BD0B75940-BD83-49A5-936B-5C718CB7F4C2%7D&file=2026%20Retail%20Marketing%20Programming_FINAL.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener">Open ↗</a></div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="card-header"><div style="display:flex;align-items:center;gap:8px;"><span>🛒</span><div class="card-title">Digital Commerce Ops</div></div><div class="card-count">1 doc</div></div>
+        <div class="doc-row"><div class="doc-icon" style="background:rgba(62,207,142,.1);">📊</div><div class="doc-info"><div class="doc-title">AMZ ASIN Forecast</div><div class="doc-meta">Google Sheets · Amazon ASIN Forecasting</div></div><a class="doc-open" style="color:var(--green);border-color:rgba(62,207,142,.3);" href="https://docs.google.com/spreadsheets/d/1KT1AYHvUDxlqL2PzdU9xZjQeOwXEkc9TDP_mObvUcEg/edit?gid=322018091#gid=322018091" target="_blank" rel="noopener">Open ↗</a></div>
       </div>
     </div>
 
@@ -1271,34 +1411,26 @@ async function sbSet(id, data) {
 }
 
 async function saveState() {
-  const doneLabels = new Set(
-    Array.from(document.getElementById('done-list')?.querySelectorAll('.task-label') || [])
-      .map(el => el.textContent.trim())
-  );
-  const state = { zones: {}, done: [], doneOpen: document.getElementById('done-list')?.style.display !== 'none' };
-  ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
-    const zone = document.getElementById(zid);
-    if (!zone) return;
-    state.zones[zid] = Array.from(zone.querySelectorAll('.task-item.draggable'))
-      .filter(item => {
+  try {
+    // Sync note textareas into data attributes before saving innerHTML
+    document.querySelectorAll('.drop-zone .task-item.draggable').forEach(item => {
+      const ta = item.querySelector('.task-notes-input');
+      if (ta) { const na = item.querySelector('.task-notes-area'); if (na) na.dataset.note = ta.value; }
+    });
+    const doneLabels = new Set(Array.from(document.getElementById('done-list')?.querySelectorAll('.task-label')||[]).map(el=>el.textContent.trim()));
+    const state = {zones:{},done:[],doneOpen:document.getElementById('done-list')?.style.display!=='none'};
+    ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
+      const zone = document.getElementById(zid); if (!zone) return;
+      state.zones[zid] = Array.from(zone.querySelectorAll('.task-item.draggable')).filter(item => {
         const label = item.querySelector('.task-label')?.textContent?.trim();
         return label && !doneLabels.has(label) && !item.dataset.pendingDone;
-      })
-      .map(item => ({
-        bodyHTML: item.querySelector('.task-body')?.innerHTML || '',
-        zone: item.dataset.zone || '',
-        created: item.dataset.created || '',
-        waitingOn: item.dataset.waitingOn || ''
-      }));
-  });
-  const dl = document.getElementById('done-list');
-  if (dl) state.done = Array.from(dl.querySelectorAll('.task-item')).map(item => ({
-    bodyHTML: item.querySelector('.task-body')?.innerHTML || '',
-    originZone: item.dataset.originZone || 'today'
-  }));
-  await sbSet('state', state);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
-  showSyncStatus('saved');
+      }).map(item => ({bodyHTML:item.querySelector('.task-body')?.innerHTML||'',zone:item.dataset.zone||'',created:item.dataset.created||'',waitingOn:item.dataset.waitingOn||''}));
+    });
+    const dl = document.getElementById('done-list');
+    if (dl) state.done = Array.from(dl.querySelectorAll('.task-item')).map(item => ({bodyHTML:item.querySelector('.task-body')?.innerHTML||'',originZone:item.dataset.originZone||'today'}));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    showSyncStatus('saved');
+  } catch(e) { console.warn('Save failed:',e); }
 }
 
 async function saveStamps(stamps) {
@@ -1342,8 +1474,13 @@ function applyState(state) {
           if (t.created) item.dataset.created = t.created;
           if (t.waitingOn) item.dataset.waitingOn = t.waitingOn;
           item.innerHTML = `<span class="drag-handle">⠿</span><input type="checkbox" class="task-cb"><div class="task-body">${t.bodyHTML}</div>`;
+          // Close any note areas that have no content
+          item.querySelectorAll('.task-notes-area').forEach(na => {
+            const ta = na.querySelector('.task-notes-input');
+            if (!ta || !ta.value.trim()) na.classList.remove('open');
+          });
           if (t.created) item.appendChild(makeAgeBadge(t.created));
-          attachDrag(item); zone.appendChild(item);
+          attachDrag(item); addTaskExtrasToItem(item); zone.appendChild(item);
         });
         staticLabels.forEach((label, i) => {
           if (label && !savedLabels.includes(label) && !doneLabels.has(label)) {
@@ -1458,11 +1595,15 @@ function showRouteToast(dest) {
 
 // ── BRAIN DUMP ────────────────────────────────────────────
 function saveBD() {
-  const text = document.getElementById('bdText').value.trim();
-  if (!text) return;
-  addToQueue(text, 'Inbox', 'inbox');
+  const text = document.getElementById('bdText').value.trim(); if (!text) return;
+  const emptyEl = document.getElementById('inbox-empty'); if (emptyEl) emptyEl.style.display = 'none';
+  const q = document.getElementById('inbox-queue');
+  const d = document.createElement('div'); d.className = 'task-item inbox-item'; d.dataset.dest = 'week';
+  d.innerHTML = `<div class="task-body" style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div class="task-label" style="flex:1;">${text.replace(/</g,'&lt;')}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;"><select style="font-family:'DM Mono',monospace;font-size:10px;border-radius:10px;padding:2px 6px;cursor:pointer;outline:none;background:var(--surface2);border:1px solid var(--border);color:var(--accent);" onchange="this.closest('.inbox-item').dataset.dest=this.value;updateInboxCount();"><option value="today">🔴 Today</option><option value="week" selected>🔵 This Week</option><option value="longterm">🟣 Longer Term</option><option value="team">👥 Team</option><option value="archive">Archive</option></select><button style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;" onclick="this.closest('.inbox-item').remove();updateInboxCount();">✕</button></div></div>`;
+  q.appendChild(d);
   document.getElementById('bdText').value = '';
   document.getElementById('bdModal').classList.remove('open');
+  updateInboxCount();
   showTab('inbox', document.querySelectorAll('.tab-btn')[2]);
 }
 
@@ -1889,6 +2030,170 @@ async function exportZip() {
   }
 }
 
+// ── TRIAGE MODE ───────────────────────────────────────────
+let triageActive = false;
+let triageTotal = 0;
+let triageDone = 0;
+const TRIAGE_ACTIONS = {
+  today:   [{label:'Keep',cls:'keep',zone:null},{label:'→ Week',cls:'move-week',zone:'week'},{label:'→ Later',cls:'move-later',zone:'long'},{label:'✕',cls:'del',zone:'delete'}],
+  waiting: [{label:'Keep',cls:'keep',zone:null},{label:'→ Today',cls:'move-today',zone:'today'},{label:'→ Week',cls:'move-week',zone:'week'},{label:'✕',cls:'del',zone:'delete'}],
+  week:    [{label:'Keep',cls:'keep',zone:null},{label:'→ Today',cls:'move-today',zone:'today'},{label:'→ Later',cls:'move-later',zone:'long'},{label:'✕',cls:'del',zone:'delete'}],
+  long:    [{label:'Keep',cls:'keep',zone:null},{label:'→ Week',cls:'move-week',zone:'week'},{label:'Archive ✕',cls:'del',zone:'delete'}]
+};
+function toggleTriageMode() {
+  triageActive = !triageActive;
+  const card = document.getElementById('priorities-card');
+  const btn = document.getElementById('triage-toggle-btn');
+  const bar = document.getElementById('triage-bar');
+  if (triageActive) {
+    card.classList.add('triage-mode-active');
+    btn.classList.add('active'); btn.textContent = '⚡ Triaging...';
+    bar.classList.add('visible');
+    triageTotal = 0; triageDone = 0;
+    document.querySelectorAll('#priorities-card .drop-zone .task-item.draggable').forEach(item => {
+      const zone = item.dataset.zone || 'today';
+      const actions = TRIAGE_ACTIONS[zone] || TRIAGE_ACTIONS.today;
+      item.querySelector('.triage-actions-wrap')?.remove();
+      const wrap = document.createElement('div'); wrap.className = 'triage-actions-wrap';
+      actions.forEach(a => { const pill = document.createElement('button'); pill.className = 'tr-pill '+a.cls; pill.textContent = a.label; pill.onclick = (e) => { e.stopPropagation(); triageAction(item,a.zone,wrap); }; wrap.appendChild(pill); });
+      item.appendChild(wrap); triageTotal++;
+    });
+    updateTriageProgress();
+  } else {
+    card.classList.remove('triage-mode-active');
+    btn.classList.remove('active'); btn.textContent = '⚡ Triage';
+    bar.classList.remove('visible');
+    document.querySelectorAll('#priorities-card .task-item.triaged').forEach(item => item.remove());
+    document.querySelectorAll('#priorities-card .triage-actions-wrap').forEach(el => el.remove());
+    document.querySelectorAll('#priorities-card .drop-zone .task-item.draggable').forEach(item => { item.style.opacity = ''; });
+    updateEmptyZones(); updatePrioCount(); saveState();
+  }
+}
+function triageAction(item, targetZone, wrap) {
+  if (targetZone === null) {
+    wrap.innerHTML = '<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--green);padding:0 4px;">✓ kept</span>';
+    item.style.opacity = '.4';
+  } else if (targetZone === 'delete') {
+    item.style.transition = 'all .2s'; item.style.opacity = '0'; item.style.height = '0'; item.style.padding = '0'; item.style.overflow = 'hidden';
+    setTimeout(() => { item.remove(); updateEmptyZones(); updatePrioCount(); }, 200);
+  } else {
+    const zoneEl = document.getElementById('zone-' + targetZone);
+    if (zoneEl) {
+      item.dataset.zone = targetZone;
+      item.querySelector('.triage-actions-wrap')?.remove();
+      const actions = TRIAGE_ACTIONS[targetZone] || TRIAGE_ACTIONS.today;
+      const newWrap = document.createElement('div'); newWrap.className = 'triage-actions-wrap';
+      actions.forEach(a => { const pill = document.createElement('button'); pill.className = 'tr-pill '+a.cls; pill.textContent = a.label; pill.onclick = (e) => { e.stopPropagation(); triageAction(item,a.zone,newWrap); }; newWrap.appendChild(pill); });
+      item.appendChild(newWrap); zoneEl.appendChild(item);
+    }
+    item.style.opacity = '.4';
+  }
+  triageDone++; updateTriageProgress();
+}
+function updateTriageProgress() {
+  const lbl = document.getElementById('triage-progress-label');
+  if (lbl) lbl.textContent = `${triageDone} of ${triageTotal} tasks reviewed`;
+}
+
+// ── TASK NOTES & SUBTASKS ─────────────────────────────────
+function toggleTaskNotes(btn) {
+  const body = btn.closest('.task-body');
+  const area = body.querySelector('.task-notes-area');
+  const isOpen = area.classList.toggle('open');
+  btn.classList.toggle('has-content', isOpen || !!area.querySelector('.task-notes-input')?.value?.trim());
+  if (isOpen) area.querySelector('.task-notes-input')?.focus();
+}
+function toggleTaskSubtasks(btn) {
+  const body = btn.closest('.task-body');
+  const area = body.querySelector('.task-subtasks');
+  const isOpen = area.classList.toggle('open');
+  btn.classList.toggle('has-content', isOpen || body.querySelectorAll('.task-subtask-item').length > 0);
+  if (isOpen) body.querySelector('.task-add-subtask-input')?.focus();
+}
+function addSubtask(input) {
+  const text = input.value.trim(); if (!text) return;
+  const list = input.closest('.task-subtasks').querySelector('.task-subtask-list');
+  const item = document.createElement('div'); item.className = 'task-subtask-item';
+  item.innerHTML = `<input type="checkbox" class="task-subtask-cb" onchange="saveState()"><span class="task-subtask-label" contenteditable="true" onblur="saveState()">${text}</span><button class="task-subtask-del" onclick="this.closest('.task-subtask-item').remove();saveState()">✕</button>`;
+  list.appendChild(item); input.value = '';
+  const btn = input.closest('.task-body').querySelector('[onclick*="toggleTaskSubtasks"]');
+  if (btn) btn.classList.add('has-content');
+  saveState();
+}
+function addTaskExtrasToItem(item) {
+  if (item.querySelector('.task-expand-bar')) {
+    // restore note value from data attribute
+    const notesArea = item.querySelector('.task-notes-area');
+    const ta = item.querySelector('.task-notes-input');
+    if (notesArea && ta && notesArea.dataset.note) {
+      ta.value = notesArea.dataset.note;
+      ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px';
+      if (notesArea.dataset.note.trim()) { notesArea.classList.add('open'); const btn = item.querySelector('[onclick*="toggleTaskNotes"]'); if (btn) btn.classList.add('has-content'); }
+    }
+    return;
+  }
+  const body = item.querySelector('.task-body'); if (!body) return;
+  const bar = document.createElement('div'); bar.className = 'task-expand-bar';
+  bar.innerHTML = `<button class="task-expand-btn" onclick="toggleTaskNotes(this)" title="Note">💬 Note</button><button class="task-expand-btn" onclick="toggleTaskSubtasks(this)" title="Subtasks">☑ Subtasks</button>`;
+  const notesArea = document.createElement('div'); notesArea.className = 'task-notes-area';
+  notesArea.innerHTML = `<textarea class="task-notes-input" placeholder="Add a note..." oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';saveState()" onblur="saveState()"></textarea>`;
+  const subtasksArea = document.createElement('div'); subtasksArea.className = 'task-subtasks';
+  subtasksArea.innerHTML = `<div class="task-subtask-list"></div><div class="task-add-subtask"><input class="task-add-subtask-input" placeholder="+ Add subtask..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask(this);}"></div>`;
+  const meta = body.querySelector('.task-meta');
+  if (meta) { meta.after(bar, notesArea, subtasksArea); } else { body.appendChild(bar); body.appendChild(notesArea); body.appendChild(subtasksArea); }
+}
+
+// ── CMO KEEP / DROP ───────────────────────────────────────
+function cmoItemKeep(btn) {
+  const wrap = btn.closest('.cmo-item-wrap');
+  wrap.style.opacity = '.45';
+  btn.textContent = '✓'; btn.style.background = 'rgba(62,207,142,.15)';
+}
+function cmoItemDrop(btn) {
+  const wrap = btn.closest('.cmo-item-wrap');
+  wrap.style.transition = 'all .2s'; wrap.style.opacity = '0'; wrap.style.height = '0'; wrap.style.overflow = 'hidden'; wrap.style.padding = '0';
+  setTimeout(() => { wrap.remove(); }, 210);
+}
+
+// ── NEW INBOX: TAG → PUSH ─────────────────────────────────
+function updateInboxCount() {
+  const n = document.querySelectorAll('#inbox-queue .inbox-item').length;
+  const el = document.getElementById('inbox-count');
+  if (el) el.textContent = n + ' item' + (n !== 1 ? 's' : '');
+  const emptyEl = document.getElementById('inbox-empty');
+  if (emptyEl) emptyEl.style.display = n === 0 ? 'block' : 'none';
+  const tagged = document.querySelectorAll('#inbox-queue .inbox-item[data-dest]:not([data-dest="archive"])').length;
+  const lbl = document.getElementById('inbox-tagged-label');
+  if (lbl) lbl.textContent = tagged > 0 ? `${tagged} item${tagged!==1?'s':''} tagged — push when ready` : 'Tag items above, then push when ready';
+}
+function tagInbox(dest) {
+  const text = document.getElementById('triageInput').value.trim(); if (!text) return;
+  const emptyEl = document.getElementById('inbox-empty'); if (emptyEl) emptyEl.style.display = 'none';
+  const q = document.getElementById('inbox-queue');
+  const d = document.createElement('div'); d.className = 'task-item inbox-item'; d.dataset.dest = dest;
+  const tagColors = {today:'var(--red)',week:'var(--accent)',longterm:'var(--accent2)',team:'var(--teal)',archive:'var(--text3)'};
+  d.innerHTML = `<div class="task-body" style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div class="task-label" style="flex:1;">${text.replace(/</g,'&lt;')}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;"><select style="font-family:'DM Mono',monospace;font-size:10px;border-radius:10px;padding:2px 6px;cursor:pointer;outline:none;background:var(--surface2);border:1px solid var(--border);color:${tagColors[dest]};" onchange="this.closest('.inbox-item').dataset.dest=this.value;updateInboxCount();"><option value="today" ${dest==='today'?'selected':''}>🔴 Today</option><option value="week" ${dest==='week'?'selected':''}>🔵 This Week</option><option value="longterm" ${dest==='longterm'?'selected':''}>🟣 Longer Term</option><option value="team" ${dest==='team'?'selected':''}>👥 Team</option><option value="archive" ${dest==='archive'?'selected':''}>Archive</option></select><button style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;" onclick="this.closest('.inbox-item').remove();updateInboxCount();">✕</button></div></div>`;
+  q.appendChild(d); document.getElementById('triageInput').value = ''; updateInboxCount();
+}
+function pushInboxToPriorities() {
+  const items = document.querySelectorAll('#inbox-queue .inbox-item');
+  let pushed = 0;
+  items.forEach(item => {
+    const dest = item.dataset.dest;
+    const label = item.querySelector('.task-label')?.textContent?.trim();
+    if (!label || dest === 'archive') { item.remove(); return; }
+    const zoneMap = {today:'zone-today',week:'zone-week',longterm:'zone-long'};
+    const badgeMap = {today:'<span class="badge urgent">Today</span>',week:'<span class="badge high">This Week</span>',longterm:'<span class="badge longterm">Longer Term</span>'};
+    if (dest === 'team') return;
+    const zone = document.getElementById(zoneMap[dest]);
+    if (zone) { const task = createDraggableTask(label, badgeMap[dest]||'', dest==='longterm'?'long':dest); zone.appendChild(task); item.remove(); pushed++; }
+  });
+  updateEmptyZones(); updatePrioCount(); saveState(); updateInboxCount();
+  const btn = document.getElementById('push-btn');
+  if (btn) { btn.textContent = `✓ ${pushed} pushed`; setTimeout(()=>btn.textContent='→ Push to Priorities',2000); }
+  if (pushed > 0) showTab('priorities', document.querySelectorAll('.tab-btn')[0]);
+}
+
 // ── INIT ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   initDragDrop();
@@ -1897,6 +2202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initAgeBadges();
   updateAgeBadges();
   updateWaitingInTeam();
+  document.querySelectorAll('.drop-zone .task-item.draggable').forEach(item => addTaskExtrasToItem(item));
   setInterval(updateAgeBadges, 60000);
 });
 </script>
