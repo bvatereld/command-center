@@ -1428,6 +1428,7 @@ async function saveState() {
     });
     const dl = document.getElementById('done-list');
     if (dl) state.done = Array.from(dl.querySelectorAll('.task-item')).map(item => ({bodyHTML:item.querySelector('.task-body')?.innerHTML||'',originZone:item.dataset.originZone||'today'}));
+    await sbSet('state', state);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     showSyncStatus('saved');
   } catch(e) { console.warn('Save failed:',e); }
