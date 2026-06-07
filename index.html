@@ -634,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4 · 2026-06-07 19:38 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4.1 · 2026-06-07 19:50 UTC</span>
   </div>
 </div>
 
@@ -1403,12 +1403,15 @@ async function sbGet(id) {
 
 async function sbSet(id, data) {
   try {
-    await fetch(`${SB_URL}/rest/v1/command_center`, {
+    const res = await fetch(`${SB_URL}/rest/v1/command_center`, {
       method: 'POST',
       headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ id, data, updated_at: new Date().toISOString() })
     });
-  } catch(e) { console.warn('Supabase save failed, using localStorage', e); }
+    const text = await res.text();
+    if (!res.ok) console.error('Supabase write error:', res.status, text);
+    else console.log('Supabase write OK:', id, res.status);
+  } catch(e) { console.error('Supabase fetch failed:', e); }
 }
 
 async function saveState() {
