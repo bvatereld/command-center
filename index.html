@@ -634,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.2 · 2026-06-08 00:35 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3 · 2026-06-08 00:37 UTC</span>
   </div>
 </div>
 
@@ -2292,6 +2292,14 @@ function pushInboxToPriorities() {
 
 // ── INIT ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // Clear hardcoded done list before restoring from Firebase
+  const doneList = document.getElementById('done-list');
+  if (doneList) doneList.innerHTML = '';
+  // Clear hardcoded tasks from zones before restoring
+  ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
+    const zone = document.getElementById(zid);
+    if (zone) zone.querySelectorAll('.task-item.draggable').forEach(el => el.remove());
+  });
   initDragDrop();
   initDoneLogic();
   await restoreState();
