@@ -634,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.1 · 2026-06-08 00:28 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.2 · 2026-06-08 00:35 UTC</span>
   </div>
 </div>
 
@@ -1445,6 +1445,35 @@ async function saveState() {
     });
     const dl = document.getElementById('done-list');
     if (dl) state.done = Array.from(dl.querySelectorAll('.task-item')).map(item => ({bodyHTML:item.querySelector('.task-body')?.innerHTML||'',originZone:item.dataset.originZone||'today'}));
+
+    // Save Notes tab
+    const notesCards = [];
+    document.querySelectorAll('.note-card').forEach(card => {
+      notesCards.push({ html: card.outerHTML });
+    });
+    state.notes = notesCards;
+
+    // Save Team tab - contenteditable boxes
+    const teamBoxes = {};
+    document.querySelectorAll('#tab-team [contenteditable]').forEach((el, i) => {
+      teamBoxes[el.id || `team-box-${i}`] = el.innerHTML;
+    });
+    state.teamBoxes = teamBoxes;
+
+    // Save Inbox queue
+    const inboxItems = [];
+    document.querySelectorAll('#inbox-queue .inbox-item').forEach(item => {
+      inboxItems.push({ html: item.innerHTML, dest: item.dataset.dest || 'week' });
+    });
+    state.inbox = inboxItems;
+
+    // Save Slack draft
+    const slackDraft = document.getElementById('slack-draft')?.value || '';
+    state.slackDraft = slackDraft;
+
+    // Save Slack history from localStorage
+    try { state.slackHistory = JSON.parse(localStorage.getItem('cmo_slack_history') || '[]'); } catch(e) { state.slackHistory = []; }
+
     await sbSet('state', state);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     showSyncStatus('saved');
@@ -1463,6 +1492,55 @@ async function restoreState() {
   }
   if (!state || !state.zones) return;
   applyState(state);
+
+  // Restore Notes tab
+  if (state.notes && state.notes.length) {
+    const notesContainer = document.querySelector('#tab-notes .notes-grid, #tab-notes');
+    if (notesContainer) {
+      const existingCards = notesContainer.querySelectorAll('.note-card');
+      existingCards.forEach(c => c.remove());
+      state.notes.forEach(n => {
+        const div = document.createElement('div');
+        div.innerHTML = n.html;
+        const card = div.firstElementChild;
+        if (card) notesContainer.appendChild(card);
+      });
+    }
+  }
+
+  // Restore Team tab contenteditable boxes
+  if (state.teamBoxes) {
+    Object.entries(state.teamBoxes).forEach(([id, html]) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    });
+  }
+
+  // Restore Inbox queue
+  if (state.inbox && state.inbox.length) {
+    const queue = document.getElementById('inbox-queue');
+    if (queue) {
+      queue.querySelectorAll('.inbox-item').forEach(i => i.remove());
+      state.inbox.forEach(item => {
+        const d = document.createElement('div');
+        d.className = 'inbox-item';
+        d.dataset.dest = item.dest || 'week';
+        d.innerHTML = item.html;
+        queue.appendChild(d);
+      });
+    }
+  }
+
+  // Restore Slack draft
+  if (state.slackDraft) {
+    const draft = document.getElementById('slack-draft');
+    if (draft) draft.value = state.slackDraft;
+  }
+
+  // Restore Slack history
+  if (state.slackHistory && state.slackHistory.length) {
+    try { localStorage.setItem('cmo_slack_history', JSON.stringify(state.slackHistory)); } catch(e) {}
+  }
 }
 
 function applyState(state) {
