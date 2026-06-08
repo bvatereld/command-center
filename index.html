@@ -634,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.0 · 2026-06-08 00:24 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.1 · 2026-06-08 00:28 UTC</span>
   </div>
 </div>
 
@@ -1403,9 +1403,10 @@ let _db = null;
 async function getDb() {
   if (_db) return _db;
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
-  const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js');
+  const { getFirestore, doc, getDoc, setDoc, initializeFirestore, persistentLocalCache } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js');
   const app = initializeApp(FIREBASE_CONFIG);
-  _db = { fs: getFirestore(app), doc, getDoc, setDoc };
+  const fs = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
+  _db = { fs, doc, getDoc, setDoc };
   return _db;
 }
 
