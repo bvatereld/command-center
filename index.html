@@ -634,7 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v4.8 · 2026-06-07 22:00 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.0 · 2026-06-08 00:24 UTC</span>
   </div>
 </div>
 
@@ -1389,31 +1389,41 @@ function createDraggableTask(label, meta, zone) {
 
 // ── PERSISTENCE — SUPABASE + localStorage fallback ───────
 const STORAGE_KEY = 'cmo_cc_state_v18';
-const SB_URL = 'https://wvwvdxyeknndspxjviyo.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2d3ZkeHlla25uZHNweGp2aXlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NTU4OTUsImV4cCI6MjA5NDIzMTg5NX0.2XvG_8JTEzOMr3FegBc-4B_v0qtBrqBlqU_eFQMQ36w';
+// Firebase config
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAlMhhnFqFQjsSdO5Nf9WT_s7EDNf82Rd4",
+  authDomain: "cmo-command-center.firebaseapp.com",
+  projectId: "cmo-command-center",
+  storageBucket: "cmo-command-center.firebasestorage.app",
+  messagingSenderId: "778648287827",
+  appId: "1:778648287827:web:a08c2a0d7b8578f23ce4a6"
+};
+// Firebase init
+let _db = null;
+async function getDb() {
+  if (_db) return _db;
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
+  const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js');
+  const app = initializeApp(FIREBASE_CONFIG);
+  _db = { fs: getFirestore(app), doc, getDoc, setDoc };
+  return _db;
+}
+
 async function sbGet(id) {
   try {
-    const url = `${SB_URL}/rest/v1/command_center?id=eq.${encodeURIComponent(id)}&select=data&apikey=${SB_KEY}`;
-    const res = await fetch(url, { mode: 'cors' });
-    if (!res.ok) { console.warn('sbGet error:', res.status); return null; }
-    const rows = await res.json();
-    console.log('sbGet OK:', id, rows);
-    return rows?.[0]?.data || null;
-  } catch(e) { console.warn('sbGet failed:', e); return null; }
+    const { fs, doc, getDoc } = await getDb();
+    const snap = await getDoc(doc(fs, 'cmo', id));
+    if (snap.exists()) { console.log('Firebase read OK:', id); return snap.data().payload; }
+    return null;
+  } catch(e) { console.warn('Firebase read failed:', e); return null; }
 }
 
 async function sbSet(id, payload) {
   try {
-    const url = `${SB_URL}/rest/v1/command_center?apikey=${SB_KEY}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ id, data: payload, updated_at: new Date().toISOString() })
-    });
-    if (!res.ok) { const t = await res.text(); console.error('sbSet error:', res.status, t); }
-    else console.log('Supabase write OK:', id);
-  } catch(e) { console.error('sbSet failed:', e); }
+    const { fs, doc, setDoc } = await getDb();
+    await setDoc(doc(fs, 'cmo', id), { payload, updated_at: new Date().toISOString() });
+    console.log('Firebase write OK:', id);
+  } catch(e) { console.error('Firebase write failed:', e); }
 }
 
 async function saveState() {
