@@ -350,7 +350,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.8 · 2026-06-17 13:14 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.9 · 2026-06-17 13:17 UTC</span>
   </div>
 </div>
 
@@ -1268,7 +1268,8 @@ function applyState(state) {
     if (state.zones) {
       ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
         const zone = document.getElementById(zid);
-        if (!zone || !state.zones[zid] || !state.zones[zid].length) return;
+        if (!zone) return;
+        if (!state.zones[zid] || !state.zones[zid].length) { zone.querySelectorAll('.task-item.draggable').forEach(el => el.remove()); return; }
         const staticItems = Array.from(zone.querySelectorAll('.task-item.draggable'));
         const staticLabels = staticItems.map(el => el.querySelector('.task-label')?.textContent?.trim());
         const savedLabels = state.zones[zid].map(t => {
@@ -1301,8 +1302,9 @@ function applyState(state) {
         });
       });
     }
+    const dl = document.getElementById('done-list');
+    if (dl) dl.innerHTML = ''; // always clear before restore
     if (state.done && state.done.length > 0) {
-      const dl = document.getElementById('done-list');
       const ds = document.getElementById('done-section');
       const cb = document.getElementById('clear-done-btn');
       state.done.forEach(t => {
@@ -1797,14 +1799,19 @@ async function exportZip() {
   try {
     const date = new Date().toISOString().slice(0,10);
     const html = document.documentElement.outerHTML;
-    const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = `command-center-${date}.html`;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => document.body.removeChild(a), 100);
+    // Try download first, fall back to opening in new tab
+    try {
+      const blob = new Blob([html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `command-center-${date}.html`;
+      a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    } catch(err) {
+      // Flotato fallback: open in new tab
+      const w = window.open('', '_blank');
+      if (w) { w.document.write(html); w.document.close(); }
+    }
     if (btn) { btn.textContent = '✓ Backed up'; setTimeout(() => { btn.textContent = '↓ Backup'; btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }, 2000); }
   } catch(e) {
     console.error('Backup failed:', e);
