@@ -350,7 +350,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.10 · 2026-06-17 13:21 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.11 · 2026-06-17 13:36 UTC</span>
   </div>
 </div>
 
@@ -1259,6 +1259,10 @@ async function restoreState() {
   if (state.slackHistory && state.slackHistory.length) {
     try { localStorage.setItem('cmo_slack_history', JSON.stringify(state.slackHistory)); } catch(e) {}
   }
+  // Update all counts after restore
+  if (typeof updateDoneCount === 'function') updateDoneCount();
+  if (typeof updatePrioCount === 'function') updatePrioCount();
+  if (typeof updateInboxCount === 'function') updateInboxCount();
 }
 
 function applyState(state) {
