@@ -350,7 +350,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.7 · 2026-06-17 12:46 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.8 · 2026-06-17 13:14 UTC</span>
   </div>
 </div>
 
@@ -1794,47 +1794,17 @@ function updateWaitingInTeam() {
 async function exportZip() {
   const btn = document.querySelector('[onclick="exportZip()"]');
   if (btn) { btn.textContent = '⏳ Backing up...'; btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
-
   try {
-    const zip = new JSZip();
     const date = new Date().toISOString().slice(0,10);
-
-    // 1. Full HTML snapshot
-    zip.file(`command-center-${date}.html`, document.documentElement.outerHTML);
-
-    // 2. Live state JSON
-    const state = {
-      exportedAt: new Date().toISOString(),
-      localStorage: {}
-    };
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key.startsWith('cmo_')) state.localStorage[key] = localStorage.getItem(key);
-    }
-    // Also capture current task state directly
-    state.tasks = { today: [], week: [], long: [], done: [] };
-    ['zone-today','zone-week','zone-long'].forEach(zid => {
-      const key = zid.replace('zone-','');
-      document.getElementById(zid)?.querySelectorAll('.task-item').forEach(item => {
-        state.tasks[key].push({ label: item.querySelector('.task-label')?.textContent?.trim(), checked: item.querySelector('.task-cb')?.checked || false });
-      });
-    });
-    document.getElementById('done-list')?.querySelectorAll('.task-item').forEach(item => {
-      state.tasks.done.push({ label: item.querySelector('.task-label')?.textContent?.trim(), originZone: item.dataset.originZone });
-    });
-    zip.file(`command-center-state-${date}.json`, JSON.stringify(state, null, 2));
-
-    // 3. Generate and download
-    const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-    const url = URL.createObjectURL(blob);
+    const html = document.documentElement.outerHTML;
+    const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `command-center-backup-${date}.zip`;
+    a.href = dataUrl;
+    a.download = `command-center-${date}.html`;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-
+    setTimeout(() => document.body.removeChild(a), 100);
     if (btn) { btn.textContent = '✓ Backed up'; setTimeout(() => { btn.textContent = '↓ Backup'; btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }, 2000); }
   } catch(e) {
     console.error('Backup failed:', e);
