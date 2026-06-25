@@ -149,6 +149,7 @@ function createDraggableTask(label, meta, zone) {
   item.innerHTML = `<span class="drag-handle">⠿</span><input type="checkbox" class="task-cb"><div class="task-body"><div class="task-label">${label}</div><div class="task-meta">${meta}</div></div>`;
   attachDrag(item);
   attachLabelEdit(item.querySelector('.task-label'));
+  addTaskExtrasToItem(item);
   return item;
 }
 function attachLabelEdit(labelEl) {
