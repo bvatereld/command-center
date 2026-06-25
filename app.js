@@ -148,7 +148,36 @@ function createDraggableTask(label, meta, zone) {
   item.dataset.zone = zone;
   item.innerHTML = `<span class="drag-handle">⠿</span><input type="checkbox" class="task-cb"><div class="task-body"><div class="task-label">${label}</div><div class="task-meta">${meta}</div></div>`;
   attachDrag(item);
+  attachLabelEdit(item.querySelector('.task-label'));
   return item;
+}
+function attachLabelEdit(labelEl) {
+  labelEl.title = 'Double-click to edit';
+  labelEl.addEventListener('dblclick', () => {
+    const current = labelEl.textContent;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = current;
+    input.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--accent);border-radius:4px;padding:2px 6px;font-family:inherit;font-size:inherit;color:var(--text);outline:none;';
+    labelEl.replaceWith(input);
+    input.focus(); input.select();
+    let committed = false;
+    const commit = () => {
+      if (committed) return; committed = true;
+      const newVal = input.value.trim() || current;
+      const newLabel = document.createElement('div');
+      newLabel.className = 'task-label';
+      newLabel.textContent = newVal;
+      attachLabelEdit(newLabel);
+      input.replaceWith(newLabel);
+      saveState();
+    };
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+      if (e.key === 'Escape') { input.value = current; input.blur(); }
+    });
+  });
 }
 
 // ── PERSISTENCE — SUPABASE + localStorage fallback ───────
@@ -345,7 +374,9 @@ function applyState(state) {
             if (!ta || !ta.value.trim()) na.classList.remove('open');
           });
           if (t.created) item.appendChild(makeAgeBadge(t.created));
-          attachDrag(item); addTaskExtrasToItem(item); zone.appendChild(item);
+          attachDrag(item); addTaskExtrasToItem(item);
+          const lbl = item.querySelector('.task-label'); if (lbl) attachLabelEdit(lbl);
+          zone.appendChild(item);
         });
         staticLabels.forEach((label, i) => {
           if (label && !savedLabels.includes(label) && !doneLabels.has(label)) {
