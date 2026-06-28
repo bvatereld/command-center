@@ -722,61 +722,340 @@ function initAgeBadges() {
   if (changed) { try { localStorage.setItem('cmo_task_stamps', JSON.stringify(stamps)); } catch(e) {} }
 }
 // ─────────────────────────────────────────────────────────
+// ── SUNDAY RITUAL ─────────────────────────────────────────
 let ritualStep = 1;
-const ritualSteps = [
-  { title:'Step 1 of 5 — Pulse', html:`<div style="margin-bottom:14px;"><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">WHAT MUST BE TRUE BY FRIDAY?</div><p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;">One number, outcome, or state that defines a successful week. Be specific — what moves the needle?</p><textarea id="r-pulse" style="width:100%;min-height:90px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="e.g. Break $1.4M Amazon ordered revenue..."></textarea></div>` },
-  { title:'Step 2 of 5 — Tone', html:`<div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">WHAT'S THE REGISTER THIS WEEK?</div><p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;">Pick the tone that matches what the team needs to hear.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div class="tone-opt" onclick="selTone(this)" style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Urgent &amp; focused</div><div style="font-size:11.5px;color:var(--text3);">Heads down, execute</div></div><div class="tone-opt" onclick="selTone(this)" style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Confident &amp; building</div><div style="font-size:11.5px;color:var(--text3);">We're on a run, keep going</div></div><div class="tone-opt" onclick="selTone(this)" style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Challenging</div><div style="font-size:11.5px;color:var(--text3);">Push the team to level up</div></div><div class="tone-opt" onclick="selTone(this)" style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Energizing</div><div style="font-size:11.5px;color:var(--text3);">Big moment, rise to it</div></div></div></div>` },
-  { title:'Step 3 of 5 — Acknowledge', html:`<div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">WIN FROM LAST WEEK TO CARRY FORWARD</div><p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;">Brief acknowledgment before pivoting to this week. Keeps momentum high.</p><textarea id="r-ack" style="width:100%;min-height:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="e.g. Great progress driving PDPV last week..."></textarea></div>` },
-  { title:'Step 4 of 5 — Priorities', html:`<div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">PRIORITIES THIS WEEK</div><p style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.6;">What do you own? What does the team contribute to?</p><div style="margin-bottom:10px;"><div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--accent);margin-bottom:5px;letter-spacing:.05em;">I OWN</div><textarea id="r-own" style="width:100%;min-height:60px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="One per line..."></textarea></div><div><div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--green);margin-bottom:5px;letter-spacing:.05em;">TEAM CONTRIBUTES</div><textarea id="r-team" style="width:100%;min-height:60px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="One per line..."></textarea></div></div>` },
-  { title:'Step 5 of 5 — CMO Focus Review', html:`<div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">REVIEW LAST WEEK'S CMO FOCUS</div><p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">For each item — Keep it, or Drop it. Then add the new CMO focus items from this week. Hit the button below to go straight there.</p><button onclick="goToCmoReview()" style="width:100%;padding:12px;border-radius:8px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-bottom:12px;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">→ Open CMO Focus Review</button><div style="padding:12px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:8px;"><div style="font-size:12.5px;color:var(--gold);font-weight:500;margin-bottom:8px;">✓ Before you close</div><div style="font-size:13px;color:var(--text2);line-height:2;">☐ Slack message edited &amp; copied<br>☐ CMO Focus items reviewed (keep / drop)<br>☐ New CMO Focus items added<br>☐ Priority scaffold loaded into dashboard</div></div></div>` }
+const RITUAL_STEPS = 4;
+
+// State held in memory during ritual
+const ritualData = { lastIntent:'', lastResult:'', lastResultNote:'', thisIntent:'', ownItems:[], teamItems:[], cmoPersonIdx:0 };
+
+const CMO_PEOPLE = [
+  { key:'nick',    name:'Nick',    role:'Search & Social',              cls:'bl',  color:'var(--accent)' },
+  { key:'andrew',  name:'Andrew',  role:'Upper Funnel — DSP, CTV',      cls:'pu',  color:'#a78bfa' },
+  { key:'sterling',name:'Sterling',role:'CRM & Martech',                cls:'te',  color:'var(--teal)' },
+  { key:'ellie',   name:'Ellie',   role:'Digital Commerce',             cls:'el',  color:'var(--green)' }
 ];
+
+const LAST_WEEK_INTENT = `Team,
+
+This is a very simple week: Deliver on Prime Days. If there is one number to remember it is: At least 1.9M in scanned sales over 4 days. Now I would like to beat this and we can. It will take all of us to be laser focused and monitor hourly to hit it. Make sure performance is in line and if we see we are falling behind what can be done to over correct right away, from media to CRM. Ellie will keep all of us posted on total sales but on each of your levers please stay very close.
+
+Now at the same time not everything stops so we still need to get the ball rolling but NOTHING can take priority over Prime execution.
+
+Some other execution that we need to keep in mind:
+* Move volume of clicks on Walmart and Target Search up WoW
+* Grow UGC clicks meaningfully to Target.com
+* Finalize 7E BOGO media plan
+* IC Costco performance / get ROAS up and work on doubling spend
+* Lock in Energy push on target.com
+
+Let's make it count`;
+
+function getRitualStepHTML(step) {
+  if (step === 1) {
+    const saved = ritualData.lastIntent || LAST_WEEK_INTENT;
+    return `<div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">LAST WEEK'S INTENT</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Review what you set out to do. How did the team land?</div>
+      <textarea id="r-last-intent" style="width:100%;min-height:130px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;line-height:1.6;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${saved}</textarea>
+      <div style="margin-top:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">HOW DID WE LAND?</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <div class="result-opt" data-val="delivered" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--green);">✓ Delivered</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">We hit it</div></div>
+          <div class="result-opt" data-val="mostly" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--gold);">~ Mostly</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Close but not all</div></div>
+          <div class="result-opt" data-val="missed" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--red);">✗ Missed</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Short of the goal</div></div>
+        </div>
+        <textarea id="r-result-note" style="width:100%;min-height:52px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:none;outline:none;" placeholder="One line on why (optional)..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${ritualData.lastResultNote||''}</textarea>
+      </div>
+    </div>`;
+  }
+  if (step === 2) {
+    return `<div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">THIS WEEK'S INTENT</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Set the directive. One clear message that tells the team what this week is about.</div>
+      <textarea id="r-intent" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="e.g. This week is about closing the gap on Walmart..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${ritualData.thisIntent||''}</textarea>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:6px;">I OWN</div>
+          <div id="r-own-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ritualData.ownItems.map((t,i)=>`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12.5px;color:var(--text);flex:1;">${t}</span><button onclick="removeRitualItem('own',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`).join('')}</div>
+          <div style="display:flex;gap:5px;"><input id="r-own-input" placeholder="Add item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('own');}"><button onclick="addRitualItem('own')" style="padding:6px 10px;border-radius:6px;background:var(--accent);border:none;color:white;font-size:12px;cursor:pointer;">+</button></div>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.06em;margin-bottom:6px;">TEAM OWNS (I SUPPORT)</div>
+          <div id="r-team-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ritualData.teamItems.map((t,i)=>`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12.5px;color:var(--text);flex:1;">${t}</span><button onclick="removeRitualItem('team',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`).join('')}</div>
+          <div style="display:flex;gap:5px;"><input id="r-team-input" placeholder="Add item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('team');}"><button onclick="addRitualItem('team')" style="padding:6px 10px;border-radius:6px;background:var(--green);border:none;color:#0d0f14;font-size:12px;cursor:pointer;">+</button></div>
+        </div>
+      </div>
+    </div>`;
+  }
+  if (step === 3) {
+    return buildSlackStep();
+  }
+  if (step === 4) {
+    return buildCmoStep();
+  }
+}
+
+function buildSlackStep() {
+  const lastResult = ritualData.lastResult;
+  const resultMap = { delivered:'We delivered on it.', mostly:'We mostly got there.', missed:'We fell short of the goal.' };
+  const resultLine = lastResult ? resultMap[lastResult] : '';
+  const note = ritualData.lastResultNote ? ` ${ritualData.lastResultNote}` : '';
+  const ownBullets = ritualData.ownItems.map(t => `* ${t}`).join('\n');
+  const teamBullets = ritualData.teamItems.map(t => `* ${t}`).join('\n');
+  const allBullets = [...ritualData.ownItems, ...ritualData.teamItems].map(t => `* ${t}`).join('\n');
+  const intent = ritualData.thisIntent || '';
+  const recap = resultLine ? `Last week — ${resultLine}${note}\n\n` : '';
+  const draft = `Team,\n\n${recap}${intent}\n\n${allBullets ? allBullets + '\n\n' : ''}Let's make it count`;
+  return `<div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">MONDAY SLACK MESSAGE</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Auto-drafted from your intent and priorities. Edit freely — this is your voice.</div>
+    <textarea id="r-slack" style="width:100%;min-height:200px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${draft}</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="copyRitualSlack()" style="flex:1;padding:9px;border-radius:7px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer;">📋 Copy Message</button>
+      <button onclick="saveRitualSlackToHistory()" style="padding:9px 14px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;">💾 Save to History</button>
+    </div>
+  </div>`;
+}
+
+function buildCmoStep() {
+  const idx = ritualData.cmoPersonIdx;
+  const person = CMO_PEOPLE[idx];
+  const box = document.querySelector(`.cmo-box[data-person="${person.key}"]`);
+  const items = box ? Array.from(box.querySelectorAll('.cmo-item-wrap:not([data-dropped])')) : [];
+  const itemsHTML = items.length ? items.map((wrap, i) => {
+    const label = wrap.querySelector('.cmo-item')?.textContent || '';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;">
+      <span style="font-size:13px;color:var(--text);flex:1;">${label}</span>
+      <div style="display:flex;gap:5px;">
+        <button onclick="ritualCmoKeep(this,${i},'${person.key}')" style="padding:4px 10px;border-radius:5px;background:rgba(62,207,142,.12);border:1px solid rgba(62,207,142,.3);color:var(--green);font-size:12px;cursor:pointer;font-weight:600;">Keep</button>
+        <button onclick="ritualCmoDrop(this,${i},'${person.key}')" style="padding:4px 10px;border-radius:5px;background:rgba(247,111,114,.08);border:1px solid rgba(247,111,114,.25);color:var(--red);font-size:12px;cursor:pointer;font-weight:600;">Drop</button>
+      </div>
+    </div>`;
+  }).join('') : `<div style="font-size:13px;color:var(--text3);padding:8px 0;">No current CMO focus items.</div>`;
+
+  const progress = `${idx + 1} of ${CMO_PEOPLE.length}`;
+  const navHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+    <button onclick="cmoPersonNav(-1)" style="padding:6px 12px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;${idx===0?'opacity:.3;pointer-events:none;':''}">← ${idx>0?CMO_PEOPLE[idx-1].name:'—'}</button>
+    <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">${progress}</span>
+    <button onclick="cmoPersonNav(1)" style="padding:6px 12px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;${idx===CMO_PEOPLE.length-1?'opacity:.3;pointer-events:none;':''}">Next: ${idx<CMO_PEOPLE.length-1?CMO_PEOPLE[idx+1].name:'—'} →</button>
+  </div>`;
+
+  return `<div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${person.color};">${person.name[0]}</div>
+      <div><div style="font-size:14px;font-weight:600;color:var(--text);">${person.name}</div><div style="font-size:11.5px;color:var(--text3);">${person.role}</div></div>
+      <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">CMO FOCUS REVIEW</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;" id="cmo-ritual-items">${itemsHTML}</div>
+    <div style="margin-top:8px;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;margin-bottom:6px;">ADD NEW ITEMS</div>
+      <div style="display:flex;gap:6px;"><input id="r-cmo-input" placeholder="New CMO focus item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addCmoRitualItem('${person.key}');}"><button onclick="addCmoRitualItem('${person.key}')" style="padding:7px 14px;border-radius:6px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">+ Add</button></div>
+    </div>
+    ${navHTML}
+  </div>`;
+}
+
+function selResult(el) {
+  document.querySelectorAll('.result-opt').forEach(o => { o.style.borderColor = 'var(--border)'; o.style.background = 'var(--surface2)'; });
+  el.style.borderColor = 'var(--gold)'; el.style.background = 'rgba(245,200,66,.06)';
+  ritualData.lastResult = el.dataset.val;
+}
+
+function addRitualItem(type) {
+  const input = document.getElementById(`r-${type}-input`);
+  if (!input) return;
+  const val = input.value.trim(); if (!val) return;
+  if (type === 'own') ritualData.ownItems.push(val);
+  else ritualData.teamItems.push(val);
+  input.value = '';
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(2);
+  document.getElementById(`r-${type}-input`)?.focus();
+}
+
+function removeRitualItem(type, idx) {
+  if (type === 'own') ritualData.ownItems.splice(idx, 1);
+  else ritualData.teamItems.splice(idx, 1);
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(2);
+}
+
+function cmoPersonNav(dir) {
+  // Save current step data before re-render
+  ritualData.cmoPersonIdx = Math.max(0, Math.min(CMO_PEOPLE.length - 1, ritualData.cmoPersonIdx + dir));
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(4);
+}
+
+function ritualCmoKeep(btn, idx, personKey) {
+  btn.style.background = 'rgba(62,207,142,.3)'; btn.style.fontWeight = '800';
+  btn.closest('div[style]').style.opacity = '.6';
+}
+
+function ritualCmoDrop(btn, idx, personKey) {
+  const wrap = btn.closest('div[style]');
+  wrap.style.transition = 'all .2s'; wrap.style.opacity = '0'; wrap.style.maxHeight = '0'; wrap.style.overflow = 'hidden';
+  // Also drop from the actual CMO box in My Team
+  const box = document.querySelector(`.cmo-box[data-person="${personKey}"]`);
+  if (box) {
+    const items = Array.from(box.querySelectorAll('.cmo-item-wrap'));
+    if (items[idx]) { items[idx].style.transition = 'all .2s'; items[idx].style.opacity = '0'; setTimeout(() => items[idx].remove(), 200); }
+  }
+}
+
+function addCmoRitualItem(personKey) {
+  const input = document.getElementById('r-cmo-input');
+  if (!input) return;
+  const text = input.value.trim(); if (!text) return;
+  // Add to the actual CMO box in My Team tab
+  const box = document.querySelector(`.cmo-box[data-person="${personKey}"]`);
+  if (box) {
+    const wrap = document.createElement('div'); wrap.className = 'cmo-item-wrap';
+    wrap.innerHTML = `<div class="cmo-item">${text}</div><div class="cmo-item-actions"><button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button><button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button></div>`;
+    box.appendChild(wrap);
+  }
+  input.value = '';
+  // Re-render step to show new item
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(4);
+  saveState();
+}
+
+function copyRitualSlack() {
+  const ta = document.getElementById('r-slack');
+  if (!ta) return;
+  // Save to main slack draft
+  const mainDraft = document.getElementById('slack-draft');
+  if (mainDraft) mainDraft.value = ta.value;
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.querySelector('[onclick="copyRitualSlack()"]');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Message', 2000); }
+  });
+  saveState();
+}
+
+function saveRitualSlackToHistory() {
+  const ta = document.getElementById('r-slack'); if (!ta) return;
+  const weekLabel = document.getElementById('slack-week-label')?.textContent || 'This week';
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('cmo_slack_history') || '[]'); } catch(e) {}
+  history.unshift({ week: weekLabel, preview: ta.value.slice(0, 120) + '...', full: ta.value });
+  if (history.length > 10) history = history.slice(0, 10);
+  localStorage.setItem('cmo_slack_history', JSON.stringify(history));
+  renderSlackHistory();
+  const btn = document.querySelector('[onclick="saveRitualSlackToHistory()"]');
+  if (btn) { btn.textContent = '✓ Saved'; setTimeout(() => btn.textContent = '💾 Save to History', 2000); }
+}
 
 function startSundayRitual() {
   ritualStep = 1;
+  ritualData.cmoPersonIdx = 0;
+  // Pre-populate from saved state if available
+  const savedRitual = (() => { try { return JSON.parse(localStorage.getItem('cmo_ritual_v2') || 'null'); } catch(e) { return null; } })();
+  if (savedRitual) {
+    ritualData.lastIntent = savedRitual.thisIntent || LAST_WEEK_INTENT;
+    ritualData.lastResult = '';
+    ritualData.lastResultNote = '';
+    ritualData.thisIntent = '';
+    ritualData.ownItems = [];
+    ritualData.teamItems = [];
+  } else {
+    ritualData.lastIntent = LAST_WEEK_INTENT;
+  }
   document.getElementById('ritualModal').classList.add('open');
   renderRitualStep();
 }
 
 function renderRitualStep() {
-  const s = ritualSteps[ritualStep - 1];
-  document.getElementById('ritual-step-label').textContent = s.title;
-  document.getElementById('ritual-content').innerHTML = s.html;
-  document.getElementById('ritual-progress').style.width = (ritualStep / 5 * 100) + '%';
+  const stepLabels = ['1 — Last Week', '2 — This Week', '3 — Slack', '4 — CMO Focus'];
+  document.getElementById('ritual-step-label').textContent = `Step ${ritualStep} of ${RITUAL_STEPS} — ${stepLabels[ritualStep-1].split(' — ')[1]}`;
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(ritualStep);
+  document.getElementById('ritual-progress').style.width = (ritualStep / RITUAL_STEPS * 100) + '%';
   document.getElementById('ritual-back').style.display = ritualStep > 1 ? 'block' : 'none';
-  document.getElementById('ritual-next').textContent = ritualStep === 5 ? '✓ Done' : 'Next →';
-  for (let i = 1; i <= 5; i++) {
-    const el = document.getElementById('rs' + i);
-    if (!el) continue;
+  document.getElementById('ritual-next').textContent = ritualStep === RITUAL_STEPS ? '✓ Done' : 'Next →';
+  // Highlight step pills
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('rs' + i); if (!el) continue;
     const label = el.querySelector('div:first-child');
     if (i === ritualStep) { el.style.borderColor = 'var(--gold)'; if (label) label.style.color = 'var(--gold)'; }
     else if (i < ritualStep) { el.style.borderColor = 'var(--green)'; if (label) label.style.color = 'var(--green)'; }
     else { el.style.borderColor = 'var(--border)'; if (label) label.style.color = 'var(--text3)'; }
   }
+  // Re-select result if already chosen
+  if (ritualStep === 1 && ritualData.lastResult) {
+    setTimeout(() => {
+      const opt = document.querySelector(`.result-opt[data-val="${ritualData.lastResult}"]`);
+      if (opt) selResult(opt);
+    }, 50);
+  }
 }
 
 function ritualNav(dir) {
-  if (ritualStep === 5 && dir === 1) { closeRitual(); return; }
-  ritualStep = Math.max(1, Math.min(5, ritualStep + dir));
+  // Save current step inputs before navigating
+  if (ritualStep === 1) {
+    const li = document.getElementById('r-last-intent');
+    const rn = document.getElementById('r-result-note');
+    if (li) ritualData.lastIntent = li.value;
+    if (rn) ritualData.lastResultNote = rn.value;
+  }
+  if (ritualStep === 2) {
+    const ri = document.getElementById('r-intent');
+    if (ri) ritualData.thisIntent = ri.value;
+  }
+  if (ritualStep === RITUAL_STEPS && dir === 1) {
+    // Finalize: load I Own to Priorities tab + save ritual state
+    finalizeRitual();
+    closeRitual();
+    return;
+  }
+  ritualStep = Math.max(1, Math.min(RITUAL_STEPS, ritualStep + dir));
   renderRitualStep();
 }
 
-function closeRitual() { document.getElementById('ritualModal').classList.remove('open'); }
-
-function goToCmoReview() {
-  closeRitual();
-  // Switch to Weekly Focus tab
-  showTab('rhythm', document.querySelectorAll('.tab-btn')[3]);
-  // Scroll to and highlight CMO review card
-  setTimeout(() => {
-    const card = document.querySelector('#tab-rhythm .card:last-child');
-    if (!card) return;
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    card.style.transition = 'box-shadow .3s, border-color .3s';
-    card.style.borderColor = 'var(--gold)';
-    card.style.boxShadow = '0 0 0 3px rgba(245,200,66,.15)';
-    setTimeout(() => { card.style.borderColor = 'var(--border)'; card.style.boxShadow = 'none'; }, 3000);
-  }, 150);
+function finalizeRitual() {
+  // Save ritual data for next week's Step 1
+  try { localStorage.setItem('cmo_ritual_v2', JSON.stringify({ thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems })); } catch(e) {}
+  // Pin I Own items to top of Priorities tab
+  loadWeeklyFocusToPriorities();
+  // Save slack draft to main textarea
+  const rSlack = document.getElementById('r-slack');
+  const mainDraft = document.getElementById('slack-draft');
+  if (rSlack && mainDraft && rSlack.value.trim()) mainDraft.value = rSlack.value;
+  saveState();
 }
+
+function loadWeeklyFocusToPriorities() {
+  const now = new Date();
+  const weekOf = now.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  document.querySelectorAll('.week-label-display').forEach(el => el.textContent = `Week of ${weekOf}`);
+
+  // Populate Priorities tab pinned card
+  const priContainer = document.getElementById('weekly-focus-items');
+  if (priContainer) {
+    priContainer.innerHTML = '';
+    ritualData.ownItems.forEach(text => {
+      const div = document.createElement('div'); div.className = 'focus-item';
+      div.innerHTML = `<span class="focus-dot"></span><span class="focus-text">${text}</span>`;
+      priContainer.appendChild(div);
+    });
+  }
+  const priCard = document.getElementById('weekly-focus-card');
+  if (priCard) priCard.style.display = ritualData.ownItems.length ? 'block' : 'none';
+
+  // Populate Weekly Focus tab summary card
+  const rhythmContainer = document.getElementById('weekly-focus-items-rhythm');
+  if (rhythmContainer) {
+    rhythmContainer.innerHTML = '';
+    ritualData.ownItems.forEach(text => {
+      const div = document.createElement('div'); div.className = 'focus-item';
+      div.innerHTML = `<span class="focus-dot"></span><span class="focus-text">${text}</span>`;
+      rhythmContainer.appendChild(div);
+    });
+  }
+  const summaryCard = document.getElementById('weekly-focus-summary-card');
+  const emptyCard = document.getElementById('weekly-focus-empty-card');
+  if (summaryCard) summaryCard.style.display = ritualData.ownItems.length ? 'block' : 'none';
+  if (emptyCard) emptyCard.style.display = ritualData.ownItems.length ? 'none' : 'block';
+}
+
+function closeRitual() { document.getElementById('ritualModal').classList.remove('open'); }
 
 function selTone(el) {
   document.querySelectorAll('.tone-opt').forEach(o => { o.style.borderColor = 'var(--border)'; o.style.background = 'var(--surface2)'; });
