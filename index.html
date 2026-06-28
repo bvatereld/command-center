@@ -24,7 +24,7 @@
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.12 · 2026-06-25 12:00 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.13 · 2026-06-28 12:00 UTC</span>
   </div>
 </div>
 
@@ -42,6 +42,16 @@
 
 <!-- ════════════════════ PRIORITIES -->
 <div id="tab-priorities" class="tab-content active">
+  <!-- THIS WEEK'S FOCUS (pinned, hidden until ritual runs) -->
+  <div class="card" id="weekly-focus-card" style="display:none;margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">🎯 This Week's Focus</div>
+      <div class="week-label-display" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);"></div>
+    </div>
+    <div style="padding:10px 16px 14px;">
+      <div id="weekly-focus-items" style="display:flex;flex-direction:column;"></div>
+    </div>
+  </div>
   <div class="grid-2">
     <div class="col">
 
@@ -194,7 +204,7 @@
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">01</span><span class="prio-title">Creator Priority</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Mt. Death push</div><div class="sub1">· Check in on co-posting status with retailer</div><div class="sub1">· June creator planning</div></div></div>
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">02</span><span class="prio-title">Mt. Death Organic Push</span></div></div>
       </div>
-      <div class="cmo-box"><div class="cmo-label">CMO Focus for Nick</div><div class="cmo-item-wrap">
+      <div class="cmo-box" data-person="nick"><div class="cmo-label">CMO Focus for Nick</div><div class="cmo-item-wrap">
               <div class="cmo-item">Confirm top 5 priorities on return</div>
               <div class="cmo-item-actions">
                 <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
@@ -232,7 +242,7 @@
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">05</span><span class="prio-title">Amazon Performance</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Replicate Energy offsite keywords strategy across FSW, Iced Tea &amp; OGs Contextual campaigns</div><div class="sub1">· Monitor FSW &amp; OGs Non-SnS Purchasers Loyalty audience — strong SnS conversion efficiency</div></div></div>
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num bl">06</span><span class="prio-title">Walmart DSS Performance</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Monitor DSS pacing: Brand Retargeting (FSW &amp; Iced Tea) + OGs Contextual summer tentpole</div><div class="sub1">· Maintain Walmart Energy strategy — efficiency improved, no immediate action</div><div class="sub1">· Move dollars to Search from Energy onsite campaigns</div></div></div>
       </div>
-      <div class="cmo-box"><div class="cmo-label">CMO Focus for Andrew</div><div class="cmo-item-wrap">
+      <div class="cmo-box" data-person="andrew"><div class="cmo-label">CMO Focus for Andrew</div><div class="cmo-item-wrap">
               <div class="cmo-item">Monitor Platform / Data / Feature / Audience fees across all CTV</div>
               <div class="cmo-item-actions">
                 <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
@@ -276,7 +286,7 @@
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num te">05</span><span class="prio-title">SC Update — Storefinder / PDP Options</span></div></div>
         <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num te">06</span><span class="prio-title">CRM Affinity</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Build a roadmap based on the analysis</div></div></div>
       </div>
-      <div class="cmo-box"><div class="cmo-label">CMO Focus for Sterling</div><div class="cmo-item-wrap">
+      <div class="cmo-box" data-person="sterling"><div class="cmo-label">CMO Focus for Sterling</div><div class="cmo-item-wrap">
               <div class="cmo-item">Finalize CRM audit and share with CMO — ASAP</div>
               <div class="cmo-item-actions">
                 <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
@@ -290,6 +300,35 @@
               </div>
             </div><div class="cmo-item-wrap">
               <div class="cmo-item">Amplify CRM data with Affinity — beverage category + retailer</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div></div>
+    </div>
+    <!-- ELLIE -->
+    <div class="team-card">
+      <div class="tp-header"><div class="avatar el">E</div><div class="p-info"><div class="p-name">Ellie</div><div class="p-role">Digital Commerce Lead</div></div><div class="p-status" style="background:rgba(62,207,142,.1);color:var(--green);">Active ✓</div></div>
+      <div class="p-prio">
+        <div class="p-label">This Week's Priorities</div>
+        <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num el">01</span><span class="prio-title">Amazon Digital Commerce</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Monitor scanned sales and daily pacing</div><div class="sub1">· PO snapshot review</div></div></div>
+        <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num el">02</span><span class="prio-title">Retail.com Performance</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· Target.com UGC traffic</div><div class="sub1">· Walmart & Target search performance</div></div></div>
+        <div class="prio-row"><div style="display:flex;gap:8px;align-items:center;"><span class="prio-num el">03</span><span class="prio-title">7E BOGO + Costco</span></div><div style="padding-left:30px;margin-top:3px;"><div class="sub1">· 7E BOGO media plan finalization</div><div class="sub1">· Costco ROAS / spend growth</div></div></div>
+      </div>
+      <div class="cmo-box" data-person="ellie"><div class="cmo-label">CMO Focus for Ellie</div><div class="cmo-item-wrap">
+              <div class="cmo-item">Prime Day scanned sales pacing — report hourly</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">Walmart & Target search click volume WoW</div>
+              <div class="cmo-item-actions">
+                <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
+                <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
+              </div>
+            </div><div class="cmo-item-wrap">
+              <div class="cmo-item">7E BOGO media plan finalized</div>
               <div class="cmo-item-actions">
                 <button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button>
                 <button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button>
@@ -340,11 +379,10 @@
   <!-- HEADER -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
     <div style="display:flex;gap:6px;flex:1;">
-      <div id="rs1" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--accent);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);margin-bottom:2px;">1 — PULSE</div><div style="font-size:11px;color:var(--text3);">What must be true by Friday?</div></div>
-      <div id="rs2" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">2 — TONE</div><div style="font-size:11px;color:var(--text3);">Urgent / confident / challenging</div></div>
-      <div id="rs3" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">3 — ACK</div><div style="font-size:11px;color:var(--text3);">Win from last week</div></div>
-      <div id="rs4" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">4 — PRIORITIES</div><div style="font-size:11px;color:var(--text3);">I own vs team</div></div>
-      <div id="rs5" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">5 — CMO REVIEW</div><div style="font-size:11px;color:var(--text3);">Keep / drop / add</div></div>
+      <div id="rs1" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--accent);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);margin-bottom:2px;">1 — LAST WEEK</div><div style="font-size:11px;color:var(--text3);">How did we land?</div></div>
+      <div id="rs2" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">2 — THIS WEEK</div><div style="font-size:11px;color:var(--text3);">Intent + priorities</div></div>
+      <div id="rs3" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">3 — SLACK</div><div style="font-size:11px;color:var(--text3);">Draft + copy</div></div>
+      <div id="rs4" class="rs-pill" style="flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:2px;">4 — CMO FOCUS</div><div style="font-size:11px;color:var(--text3);">Keep / drop / add</div></div>
     </div>
     <button onclick="startSundayRitual()" style="padding:10px 18px;border-radius:8px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">☀ Sunday Ritual</button>
   </div>
@@ -355,106 +393,48 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">💬 Monday Slack Drop</div>
-          <div style="display:flex;align-items:center;gap:6px;"><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);" id="slack-week-label">Week of May 12</div><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div></div>
+          <div style="display:flex;align-items:center;gap:6px;"><div class="week-label-display" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);" id="slack-week-label">Week of Jun 23</div><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div></div>
         </div>
         <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
           <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Edit before sending</div>
-          <textarea id="slack-draft" style="width:100%;min-height:220px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">Team — good progress last week driving PDPV. That work is starting to show. Now it's time to capture it all and stay strong on the search side. No letting up.
-
-This week has one target: break $1.4M in Amazon ordered revenue. That number is within reach — but only if we execute on all three levers at once.
-
-→ Push Search hard on Energy — this is where the volume comes from.
-→ Fix Search ROAS on FSW — we're leaving efficiency on the table.
-→ Increase spend on DSP Conversion campaigns — PDPV laid the groundwork, now convert it.
-
-In parallel, Walmart Attributed Sales need to show WoW growth. Get the Skai reporting dialed in so we can actually see it move.
-
-Heads down. Execute. Let's make $1.4M happen.</textarea>
+          <textarea id="slack-draft" style="width:100%;min-height:220px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">Run the Sunday Ritual to generate this week's message.</textarea>
         </div>
         <div style="padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;">
           <button class="tb-btn" onclick="copySlack()" id="copy-btn">📋 Copy message</button>
-          <button class="tb-btn" onclick="learnFromEdits()" style="border-color:rgba(62,207,142,.3);color:var(--green);" id="learn-btn">✦ Learn from my edits</button>
           <button class="tb-btn" onclick="saveSlackToHistory()" id="save-hist-btn">💾 Save to history</button>
-        </div>
-        <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--surface2);">
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">What I've learned from your edits</div>
-          <div id="style-notes" style="display:flex;flex-direction:column;gap:4px;">
-            <div class="style-note">Tone is direct and action-oriented — no filler phrases</div>
-            <div class="style-note">Opens with a brief acknowledgment, pivots fast to focus</div>
-            <div class="style-note">Uses → arrows for emphasis on key tactics</div>
-            <div class="style-note">Closes with a short punchy line, not a question</div>
-          </div>
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">🗂 Message History</div><div class="card-count" id="history-count">1 message</div></div>
-        <div id="slack-history">
-          <div class="history-item"><div class="history-week">Week of May 5</div><div class="history-preview">Team — Focus hasn't shifted, keep the momentum on Amazon/Walmart. Biggest month ever on Amazon in LD history — now keep building...</div></div>
-        </div>
+        <div class="card-header"><div class="card-title">🗂 Message History</div><div class="card-count" id="history-count">0 messages</div></div>
+        <div id="slack-history"><div style="padding:16px;font-size:13px;color:var(--text3);">No history yet.</div></div>
       </div>
     </div>
 
-    <!-- RIGHT: SCAFFOLD + CMO REVIEW -->
+    <!-- RIGHT: THIS WEEK'S FOCUS SUMMARY -->
     <div class="col">
-      <div class="card">
-        <div class="card-header"><div class="card-title">🎯 Priority Scaffold</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">Week of May 12</div></div>
-        <div style="padding:10px 16px 8px;border-bottom:1px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;"><div style="width:6px;height:6px;border-radius:50%;background:var(--accent);"></div><span style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);">I own</span></div>
-          <div style="display:flex;flex-direction:column;gap:5px;" id="scaffold-own">
-            <div class="scaffold-item"><input type="checkbox" class="task-cb" style="margin-top:1px;"><div class="scaffold-text" style="font-size:13px;color:var(--text);">Reporting on UGC impact</div></div>
-            <div class="scaffold-item"><input type="checkbox" class="task-cb" style="margin-top:1px;"><div class="scaffold-text" style="font-size:13px;color:var(--text);">Walmart Model — Attributed Sales growth reporting</div></div>
-            <div class="scaffold-item"><input type="checkbox" class="task-cb" style="margin-top:1px;"><div class="scaffold-text" style="font-size:13px;color:var(--text);">Push bottom of funnel on AMZ — keep team accountable</div></div>
-          </div>
+      <div class="card" id="weekly-focus-summary-card" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">🎯 This Week's Focus</div>
+          <div class="week-label-display" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);"></div>
         </div>
-        <div style="padding:10px 16px 12px;">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><span style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);">Team contributes</span></div>
-          <div style="display:flex;flex-direction:column;gap:5px;" id="scaffold-team">
-            <div class="scaffold-item team-item"><div class="scaffold-owner">N</div><div class="scaffold-text" style="font-size:13px;color:var(--text);">AMZ revenue growth — Search ROAS + DSP Conversion campaigns</div></div>
-            <div class="scaffold-item team-item"><div class="scaffold-owner">N</div><div class="scaffold-text" style="font-size:13px;color:var(--text);">C Store UGC content</div></div>
-            <div class="scaffold-item team-item"><div class="scaffold-owner">N</div><div class="scaffold-text" style="font-size:13px;color:var(--text);">NY UGC content</div></div>
-            <div class="scaffold-item team-item"><div class="scaffold-owner">N</div><div class="scaffold-text" style="font-size:13px;color:var(--text);">PDPV reporting</div></div>
-            <div class="scaffold-item team-item"><div class="scaffold-owner pu">A</div><div class="scaffold-text" style="font-size:13px;color:var(--text);">Lay out weekly performance review process</div></div>
-            <div class="scaffold-item team-item"><div class="scaffold-owner pu">A</div><div class="scaffold-text" style="font-size:13px;color:var(--text);">Get all Skai dashboards locked in and reviewed</div></div>
-          </div>
+        <div style="padding:12px 16px 6px;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:8px;">I OWN</div>
+          <div id="weekly-focus-items-rhythm" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
-        <div style="padding:10px 16px;border-top:1px solid var(--border);"><button class="tb-btn" onclick="loadScaffoldToDashboard()" id="load-scaffold-btn" style="font-size:12px;">→ Load into My Priorities</button></div>
       </div>
-
-      <!-- CMO FOCUS REVIEW -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">🔁 CMO Focus Review</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">Step 5 — Keep / Drop / Add</div></div>
-        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">Last week's CMO focus</div>
-          <div style="display:flex;flex-direction:column;gap:6px;" id="cmo-review-list">
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner">N</div><span>Confirm top 5 priorities on return</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner">N</div><span>Review search performance on Amazon &amp; Walmart</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner">N</div><span>PDPV Report</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner">N</div><span>C Store Social UGC Content</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner pu">A</div><span>Monitor Platform / Data / Feature / Audience fees across CTV</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner pu">A</div><span>Automate CTV fee tracking with Shane</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner pu">A</div><span>Conversion campaign growth</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner te">S</div><span>Finalize CRM audit and share with CMO</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner te">S</div><span>Wing Campaign — all links &amp; landing pages tested</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-            <div class="cmo-review-item"><div class="cmo-review-label"><div class="scaffold-owner te">S</div><span>Amplify CRM data with Affinity</span></div><div class="cmo-review-actions"><button class="cmo-keep-btn selected" onclick="cmoAction(this,'keep')">Keep</button><button class="cmo-drop-btn" onclick="cmoAction(this,'drop')">Drop</button></div></div>
-          </div>
-        </div>
-        <div style="padding:12px 16px;">
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Add new CMO focus items</div>
-          <div style="display:flex;flex-direction:column;gap:6px;" id="cmo-new-list"></div>
-          <div style="display:flex;gap:6px;margin-top:8px;">
-            <select id="cmo-new-owner" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;">
-              <option value="N">Nick</option><option value="A">Andrew</option><option value="S">Sterling</option>
-            </select>
-            <input id="cmo-new-text" placeholder="New CMO focus item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')addCmoFocus()">
-            <button class="tb-btn" onclick="addCmoFocus()" style="font-size:12px;">+ Add</button>
-          </div>
+      <div class="card" id="weekly-focus-empty-card">
+        <div style="padding:32px 24px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">☀</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Run your Sunday Ritual</div>
+          <div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:16px;">Set last week's review, this week's intent, generate your Slack message, and update CMO focus — all in 4 steps.</div>
+          <button onclick="startSundayRitual()" style="padding:10px 24px;border-radius:8px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer;">☀ Start Ritual</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ RETAIL FOCUS -->
+
 <div id="tab-formats" class="tab-content">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
     <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-right:4px;">Categories</span>
