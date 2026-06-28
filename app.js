@@ -1122,7 +1122,7 @@ function finalizeRitual() {
     if (!box) return;
     newItems.forEach(t => {
       const wrap = document.createElement('div'); wrap.className = 'cmo-item-wrap';
-      wrap.innerHTML = `<div class="cmo-item"><span style="font-family:'DM Mono',monospace;font-size:9px;background:rgba(245,200,66,.15);color:var(--gold);padding:1px 5px;border-radius:3px;margin-right:5px;">NEW</span>${t.text}</div><div class="cmo-item-actions"><button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button><button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button></div>`;
+      wrap.innerHTML = `<div class="cmo-item" style="display:flex;align-items:center;gap:6px;"><span style="font-family:'DM Mono',monospace;font-size:9px;background:rgba(245,200,66,.15);color:var(--gold);padding:1px 5px;border-radius:3px;flex-shrink:0;">NEW</span>${t.text}</div><div class="cmo-item-actions"><button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button><button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button></div>`;
       box.appendChild(wrap);
     });
   });
@@ -1137,34 +1137,6 @@ function finalizeRitual() {
   saveState();
 }
 
-function makeFocusItem(text) {
-  const div = document.createElement('div'); div.className = 'focus-item';
-  div.innerHTML = `<span class="focus-dot"></span><span class="focus-text" title="Double-click to edit">${text}</span>`;
-  const textEl = div.querySelector('.focus-text');
-  textEl.addEventListener('dblclick', () => {
-    const cur = textEl.textContent;
-    const input = document.createElement('input');
-    input.type = 'text'; input.value = cur;
-    input.style.cssText = 'flex:1;background:var(--surface2);border:1px solid var(--gold);border-radius:4px;padding:2px 6px;font-family:inherit;font-size:inherit;color:var(--text);outline:none;';
-    textEl.replaceWith(input); input.focus(); input.select();
-    let done = false;
-    const commit = () => {
-      if (done) return; done = true;
-      const val = input.value.trim() || cur;
-      const newEl = document.createElement('span');
-      newEl.className = 'focus-text'; newEl.title = 'Double-click to edit'; newEl.textContent = val;
-      input.replaceWith(newEl);
-      // Update ritualData
-      const idx = Array.from(div.parentElement.children).indexOf(div);
-      if (idx > -1) { ritualData.ownItems[idx] = val; saveRitualDraft(); }
-      saveState();
-    };
-    input.addEventListener('blur', commit);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } if (e.key === 'Escape') { input.value = cur; input.blur(); } });
-  });
-  return div;
-}
-
 function loadWeeklyFocusToPriorities() {
   const now = new Date();
   const weekOf = now.toLocaleDateString('en-US', { month:'short', day:'numeric' });
@@ -1174,7 +1146,11 @@ function loadWeeklyFocusToPriorities() {
   const priContainer = document.getElementById('weekly-focus-items');
   if (priContainer) {
     priContainer.innerHTML = '';
-    ritualData.ownItems.forEach(text => priContainer.appendChild(makeFocusItem(text)));
+    ritualData.ownItems.forEach(text => {
+      const div = document.createElement('div'); div.className = 'focus-item';
+      div.innerHTML = `<span class="focus-dot"></span><span class="focus-text">${text}</span>`;
+      priContainer.appendChild(div);
+    });
   }
   const priCard = document.getElementById('weekly-focus-card');
   if (priCard) priCard.style.display = ritualData.ownItems.length ? 'block' : 'none';
@@ -1183,7 +1159,11 @@ function loadWeeklyFocusToPriorities() {
   const rhythmContainer = document.getElementById('weekly-focus-items-rhythm');
   if (rhythmContainer) {
     rhythmContainer.innerHTML = '';
-    ritualData.ownItems.forEach(text => rhythmContainer.appendChild(makeFocusItem(text)));
+    ritualData.ownItems.forEach(text => {
+      const div = document.createElement('div'); div.className = 'focus-item';
+      div.innerHTML = `<span class="focus-dot"></span><span class="focus-text">${text}</span>`;
+      rhythmContainer.appendChild(div);
+    });
   }
   const summaryCard = document.getElementById('weekly-focus-summary-card');
   const emptyCard = document.getElementById('weekly-focus-empty-card');
