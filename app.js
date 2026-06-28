@@ -1122,7 +1122,7 @@ function finalizeRitual() {
     if (!box) return;
     newItems.forEach(t => {
       const wrap = document.createElement('div'); wrap.className = 'cmo-item-wrap';
-      wrap.innerHTML = `<div class="cmo-item" style="display:flex;align-items:center;gap:6px;"><span style="font-family:'DM Mono',monospace;font-size:9px;background:rgba(245,200,66,.15);color:var(--gold);padding:1px 5px;border-radius:3px;flex-shrink:0;">NEW</span>${t.text}</div><div class="cmo-item-actions"><button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button><button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button></div>`;
+      wrap.innerHTML = `<div class="cmo-item"><span style="font-family:'DM Mono',monospace;font-size:9px;background:rgba(245,200,66,.15);color:var(--gold);padding:1px 5px;border-radius:3px;margin-right:5px;">NEW</span>${t.text}</div><div class="cmo-item-actions"><button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button><button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button></div>`;
       box.appendChild(wrap);
     });
   });
