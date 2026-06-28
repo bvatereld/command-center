@@ -194,6 +194,7 @@ const FIREBASE_CONFIG = {
 };
 // Firebase init
 let _db = null;
+let _stateRestored = false; // guard: never save until Firebase restore completes
 async function getDb() {
   if (_db) return _db;
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
@@ -222,6 +223,7 @@ async function sbSet(id, payload) {
 }
 
 async function saveState() {
+  if (!_stateRestored) { console.warn('saveState blocked — restore not yet complete'); return; }
   try {
     // Sync note textareas into data attributes before saving innerHTML
     document.querySelectorAll('.drop-zone .task-item.draggable').forEach(item => {
@@ -284,7 +286,7 @@ async function restoreState() {
   if (!state || !state.zones) {
     try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) state = JSON.parse(raw); } catch(e) {}
   }
-  if (!state || !state.zones) return;
+  if (!state || !state.zones) { _stateRestored = true; return; }
   applyState(state);
 
   // Restore Notes tab
@@ -339,6 +341,8 @@ async function restoreState() {
   if (typeof updateDoneCount === 'function') updateDoneCount();
   if (typeof updatePrioCount === 'function') updatePrioCount();
   if (typeof updateInboxCount === 'function') updateInboxCount();
+  _stateRestored = true; // unlock saves — restore complete
+  console.log('State restored — saves now unlocked');
 }
 
 function applyState(state) {
