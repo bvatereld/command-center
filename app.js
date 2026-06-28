@@ -758,7 +758,7 @@ function getRitualStepHTML(step) {
     return `<div>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">LAST WEEK'S INTENT</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Review what you set out to do. How did the team land?</div>
-      <textarea id="r-last-intent" style="width:100%;min-height:130px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;line-height:1.6;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${saved}</textarea>
+      <textarea id="r-last-intent" style="width:100%;min-height:130px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;line-height:1.6;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.lastIntent=this.value;saveRitualDraft()">${saved}</textarea>
       <div style="margin-top:12px;">
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">HOW DID WE LAND?</div>
         <div style="display:flex;gap:8px;margin-bottom:10px;">
@@ -766,7 +766,7 @@ function getRitualStepHTML(step) {
           <div class="result-opt" data-val="mostly" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--gold);">~ Mostly</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Close but not all</div></div>
           <div class="result-opt" data-val="missed" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--red);">✗ Missed</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Short of the goal</div></div>
         </div>
-        <textarea id="r-result-note" style="width:100%;min-height:52px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:none;outline:none;" placeholder="One line on why (optional)..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${ritualData.lastResultNote||''}</textarea>
+        <textarea id="r-result-note" style="width:100%;min-height:52px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:none;outline:none;" placeholder="One line on why (optional)..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.lastResultNote=this.value;saveRitualDraft()">${ritualData.lastResultNote||''}</textarea>
       </div>
     </div>`;
   }
@@ -774,7 +774,7 @@ function getRitualStepHTML(step) {
     return `<div>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">THIS WEEK'S INTENT</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Set the directive. One clear message that tells the team what this week is about.</div>
-      <textarea id="r-intent" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="e.g. This week is about closing the gap on Walmart..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${ritualData.thisIntent||''}</textarea>
+      <textarea id="r-intent" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="e.g. This week is about closing the gap on Walmart..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.thisIntent=this.value;saveRitualDraft()">${ritualData.thisIntent||''}</textarea>
       <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:6px;">I OWN</div>
@@ -876,10 +876,31 @@ function buildCmoStep() {
   </div>`;
 }
 
+function saveRitualDraft() {
+  try { localStorage.setItem('cmo_ritual_draft', JSON.stringify({ step: ritualStep, data: { lastIntent: ritualData.lastIntent, lastResult: ritualData.lastResult, lastResultNote: ritualData.lastResultNote, thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems } })); } catch(e) {}
+}
+
+function restoreRitualDraft() {
+  try {
+    const raw = localStorage.getItem('cmo_ritual_draft');
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (!saved || !saved.data) return false;
+    Object.assign(ritualData, saved.data);
+    ritualStep = saved.step || 1;
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearRitualDraft() {
+  try { localStorage.removeItem('cmo_ritual_draft'); } catch(e) {}
+}
+
 function selResult(el) {
   document.querySelectorAll('.result-opt').forEach(o => { o.style.borderColor = 'var(--border)'; o.style.background = 'var(--surface2)'; });
   el.style.borderColor = 'var(--gold)'; el.style.background = 'rgba(245,200,66,.06)';
   ritualData.lastResult = el.dataset.val;
+  saveRitualDraft();
 }
 
 function addRitualItem(type) {
@@ -894,6 +915,7 @@ function addRitualItem(type) {
     ritualData.teamItems.push({ person, text: val });
   }
   input.value = '';
+  saveRitualDraft();
   document.getElementById('ritual-content').innerHTML = getRitualStepHTML(2);
   document.getElementById(`r-${type}-input`)?.focus();
 }
@@ -901,6 +923,7 @@ function addRitualItem(type) {
 function removeRitualItem(type, idx) {
   if (type === 'own') ritualData.ownItems.splice(idx, 1);
   else ritualData.teamItems.splice(idx, 1);
+  saveRitualDraft();
   document.getElementById('ritual-content').innerHTML = getRitualStepHTML(2);
 }
 
@@ -970,20 +993,27 @@ function saveRitualSlackToHistory() {
 }
 
 function startSundayRitual() {
-  ritualStep = 1;
   ritualData.cmoPersonIdx = 0;
-  // Pre-populate from saved state if available
-  const savedRitual = (() => { try { return JSON.parse(localStorage.getItem('cmo_ritual_v2') || 'null'); } catch(e) { return null; } })();
-  if (savedRitual) {
-    ritualData.lastIntent = savedRitual.thisIntent || LAST_WEEK_INTENT;
-    ritualData.lastResult = '';
-    ritualData.lastResultNote = '';
-    ritualData.thisIntent = '';
-    ritualData.ownItems = [];
-    ritualData.teamItems = [];
-  } else {
-    ritualData.lastIntent = LAST_WEEK_INTENT;
+
+  // First: check for an in-progress draft (e.g. modal was closed mid-ritual)
+  const hasDraft = restoreRitualDraft();
+  if (hasDraft) {
+    // Resume where they left off
+    document.getElementById('ritualModal').classList.add('open');
+    renderRitualStep();
+    return;
   }
+
+  // Fresh start: pre-populate last week's intent from previous completed ritual
+  ritualStep = 1;
+  const savedRitual = (() => { try { return JSON.parse(localStorage.getItem('cmo_ritual_v2') || 'null'); } catch(e) { return null; } })();
+  ritualData.lastIntent = (savedRitual?.thisIntent) || LAST_WEEK_INTENT;
+  ritualData.lastResult = '';
+  ritualData.lastResultNote = '';
+  ritualData.thisIntent = '';
+  ritualData.ownItems = [];
+  ritualData.teamItems = [];
+
   document.getElementById('ritualModal').classList.add('open');
   renderRitualStep();
 }
@@ -1067,6 +1097,7 @@ function finalizeRitual() {
   const rSlack = document.getElementById('r-slack');
   const mainDraft = document.getElementById('slack-draft');
   if (rSlack && mainDraft && rSlack.value.trim()) mainDraft.value = rSlack.value;
+  clearRitualDraft(); // ritual complete — clear the in-progress draft
   saveState();
 }
 
