@@ -727,6 +727,7 @@ let ritualStep = 1;
 const RITUAL_STEPS = 4;
 
 // State held in memory during ritual
+// teamItems: [{person: 'nick', text: '...'}]
 const ritualData = { lastIntent:'', lastResult:'', lastResultNote:'', thisIntent:'', ownItems:[], teamItems:[], cmoPersonIdx:0 };
 
 const CMO_PEOPLE = [
@@ -782,8 +783,15 @@ function getRitualStepHTML(step) {
         </div>
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.06em;margin-bottom:6px;">TEAM OWNS (I SUPPORT)</div>
-          <div id="r-team-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ritualData.teamItems.map((t,i)=>`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12.5px;color:var(--text);flex:1;">${t}</span><button onclick="removeRitualItem('team',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`).join('')}</div>
-          <div style="display:flex;gap:5px;"><input id="r-team-input" placeholder="Add item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('team');}"><button onclick="addRitualItem('team')" style="padding:6px 10px;border-radius:6px;background:var(--green);border:none;color:#0d0f14;font-size:12px;cursor:pointer;">+</button></div>
+          <div id="r-team-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ritualData.teamItems.map((t,i)=>{
+            const p = CMO_PEOPLE.find(p=>p.key===t.person)||CMO_PEOPLE[0];
+            return `<div style="display:flex;align-items:center;gap:6px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(62,207,142,.12);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;color:${p.color};flex-shrink:0;">${p.name[0]}</div><span style="font-size:12.5px;color:var(--text);flex:1;">${t.text}</span><button onclick="removeRitualItem('team',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`;
+          }).join('')}</div>
+          <div style="display:flex;gap:5px;">
+            <select id="r-team-person" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;flex-shrink:0;">${CMO_PEOPLE.map(p=>`<option value="${p.key}">${p.name}</option>`).join('')}</select>
+            <input id="r-team-input" placeholder="Add item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('team');}">
+            <button onclick="addRitualItem('team')" style="padding:6px 10px;border-radius:6px;background:var(--green);border:none;color:#0d0f14;font-size:12px;cursor:pointer;">+</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -803,7 +811,7 @@ function buildSlackStep() {
   const note = ritualData.lastResultNote ? ` ${ritualData.lastResultNote}` : '';
   const ownBullets = ritualData.ownItems.map(t => `* ${t}`).join('\n');
   const teamBullets = ritualData.teamItems.map(t => `* ${t}`).join('\n');
-  const allBullets = [...ritualData.ownItems, ...ritualData.teamItems].map(t => `* ${t}`).join('\n');
+  const allBullets = [...ritualData.ownItems, ...ritualData.teamItems.map(t=>t.text)].map(t => `* ${t}`).join('\n');
   const intent = ritualData.thisIntent || '';
   const recap = resultLine ? `Last week — ${resultLine}${note}\n\n` : '';
   const draft = `Team,\n\n${recap}${intent}\n\n${allBullets ? allBullets + '\n\n' : ''}Let's make it count`;
@@ -823,7 +831,9 @@ function buildCmoStep() {
   const person = CMO_PEOPLE[idx];
   const box = document.querySelector(`.cmo-box[data-person="${person.key}"]`);
   const items = box ? Array.from(box.querySelectorAll('.cmo-item-wrap:not([data-dropped])')) : [];
-  const itemsHTML = items.length ? items.map((wrap, i) => {
+
+  // Existing items — keep/drop
+  const existingHTML = items.length ? items.map((wrap, i) => {
     const label = wrap.querySelector('.cmo-item')?.textContent || '';
     return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;">
       <span style="font-size:13px;color:var(--text);flex:1;">${label}</span>
@@ -832,10 +842,20 @@ function buildCmoStep() {
         <button onclick="ritualCmoDrop(this,${i},'${person.key}')" style="padding:4px 10px;border-radius:5px;background:rgba(247,111,114,.08);border:1px solid rgba(247,111,114,.25);color:var(--red);font-size:12px;cursor:pointer;font-weight:600;">Drop</button>
       </div>
     </div>`;
-  }).join('') : `<div style="font-size:13px;color:var(--text3);padding:8px 0;">No current CMO focus items.</div>`;
+  }).join('') : `<div style="font-size:13px;color:var(--text3);padding:4px 0;">No existing CMO focus items.</div>`;
+
+  // New items from Step 2 for this person
+  const newItems = ritualData.teamItems.filter(t => t.person === person.key);
+  const newHTML = newItems.length ? `
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:.06em;margin:10px 0 6px;">FROM THIS WEEK'S PRIORITIES</div>
+    ${newItems.map((t, i) => `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.2);border-radius:7px;">
+      <span style="font-family:'DM Mono',monospace;font-size:9px;background:rgba(245,200,66,.15);color:var(--gold);padding:2px 6px;border-radius:3px;flex-shrink:0;">NEW</span>
+      <span style="font-size:13px;color:var(--text);flex:1;">${t.text}</span>
+      <button onclick="removeNewCmoItem('${person.key}',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button>
+    </div>`).join('')}` : '';
 
   const progress = `${idx + 1} of ${CMO_PEOPLE.length}`;
-  const navHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+  const navHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
     <button onclick="cmoPersonNav(-1)" style="padding:6px 12px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;${idx===0?'opacity:.3;pointer-events:none;':''}">← ${idx>0?CMO_PEOPLE[idx-1].name:'—'}</button>
     <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">${progress}</span>
     <button onclick="cmoPersonNav(1)" style="padding:6px 12px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;${idx===CMO_PEOPLE.length-1?'opacity:.3;pointer-events:none;':''}">Next: ${idx<CMO_PEOPLE.length-1?CMO_PEOPLE[idx+1].name:'—'} →</button>
@@ -847,10 +867,10 @@ function buildCmoStep() {
       <div><div style="font-size:14px;font-weight:600;color:var(--text);">${person.name}</div><div style="font-size:11.5px;color:var(--text3);">${person.role}</div></div>
       <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">CMO FOCUS REVIEW</div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;" id="cmo-ritual-items">${itemsHTML}</div>
-    <div style="margin-top:8px;">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;margin-bottom:6px;">ADD NEW ITEMS</div>
-      <div style="display:flex;gap:6px;"><input id="r-cmo-input" placeholder="New CMO focus item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addCmoRitualItem('${person.key}');}"><button onclick="addCmoRitualItem('${person.key}')" style="padding:7px 14px;border-radius:6px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">+ Add</button></div>
+    <div style="display:flex;flex-direction:column;gap:6px;" id="cmo-ritual-items">${existingHTML}${newHTML}</div>
+    <div style="margin-top:10px;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;margin-bottom:6px;">ADD MORE ITEMS</div>
+      <div style="display:flex;gap:6px;"><input id="r-cmo-input" placeholder="Additional CMO focus item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addCmoRitualItem('${person.key}');}"><button onclick="addCmoRitualItem('${person.key}')" style="padding:7px 14px;border-radius:6px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">+ Add</button></div>
     </div>
     ${navHTML}
   </div>`;
@@ -866,8 +886,13 @@ function addRitualItem(type) {
   const input = document.getElementById(`r-${type}-input`);
   if (!input) return;
   const val = input.value.trim(); if (!val) return;
-  if (type === 'own') ritualData.ownItems.push(val);
-  else ritualData.teamItems.push(val);
+  if (type === 'own') {
+    ritualData.ownItems.push(val);
+  } else {
+    const personSel = document.getElementById('r-team-person');
+    const person = personSel ? personSel.value : 'nick';
+    ritualData.teamItems.push({ person, text: val });
+  }
   input.value = '';
   document.getElementById('ritual-content').innerHTML = getRitualStepHTML(2);
   document.getElementById(`r-${type}-input`)?.focus();
@@ -1009,10 +1034,34 @@ function ritualNav(dir) {
   renderRitualStep();
 }
 
+function removeNewCmoItem(personKey, idx) {
+  const items = ritualData.teamItems.filter(t => t.person === personKey);
+  const item = items[idx];
+  if (item) {
+    const globalIdx = ritualData.teamItems.indexOf(item);
+    if (globalIdx > -1) ritualData.teamItems.splice(globalIdx, 1);
+  }
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(4);
+}
+
 function finalizeRitual() {
   // Save ritual data for next week's Step 1
   try { localStorage.setItem('cmo_ritual_v2', JSON.stringify({ thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems })); } catch(e) {}
-  // Pin I Own items to top of Priorities tab
+
+  // Inject NEW team items into each person's CMO box with NEW badge
+  CMO_PEOPLE.forEach(person => {
+    const newItems = ritualData.teamItems.filter(t => t.person === person.key);
+    if (!newItems.length) return;
+    const box = document.querySelector(`.cmo-box[data-person="${person.key}"]`);
+    if (!box) return;
+    newItems.forEach(t => {
+      const wrap = document.createElement('div'); wrap.className = 'cmo-item-wrap';
+      wrap.innerHTML = `<div class="cmo-item" style="display:flex;align-items:center;gap:6px;"><span style="font-family:'DM Mono',monospace;font-size:9px;background:rgba(245,200,66,.15);color:var(--gold);padding:1px 5px;border-radius:3px;flex-shrink:0;">NEW</span>${t.text}</div><div class="cmo-item-actions"><button class="cmo-item-keep" onclick="cmoItemKeep(this)">✓</button><button class="cmo-item-drop" onclick="cmoItemDrop(this)">✕</button></div>`;
+      box.appendChild(wrap);
+    });
+  });
+
+  // Pin I Own items to Priorities tab
   loadWeeklyFocusToPriorities();
   // Save slack draft to main textarea
   const rSlack = document.getElementById('r-slack');
