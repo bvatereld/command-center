@@ -728,7 +728,26 @@ const RITUAL_STEPS = 4;
 
 // State held in memory during ritual
 // teamItems: [{person: 'nick', text: '...'}]
-const ritualData = { lastIntent:'', lastResult:'', lastResultNote:'', thisIntent:'', ownItems:[], teamItems:[], cmoPersonIdx:0 };
+// accomplishments: ['bullet1', 'bullet2'] — what we did/missed last week
+// teamAccomplish: ['bullet1', ...] — last week's "what to accomplish", shown as reference in Step 1
+const ritualData = { lastIntent:'', lastResult:'', lastResultNote:'', accomplishments:[], teamAccomplish:[], thisIntent:'', ownItems:[], teamItems:[], cmoPersonIdx:0 };
+
+const LAST_WEEK_ACCOMPLISH = [
+  'Deliver on Amazon Prime Forecast',
+  'Move volume of clicks on Walmart and Target Search up WoW',
+  'Grow UGC clicks meaningfully on Target',
+  'Finalize 7E BOGO media plan',
+  'IC Costco performance / get ROAS up and work on doubling spend',
+  'Lock in Energy push on target.com'
+];
+
+const LAST_WEEK_OWN = [
+  'Hit Prime Forecast',
+  'Media Plan Costco',
+  'Monitor Costco',
+  'Update Velocity for Target / Walmart',
+  'Monitor Target / Walmart Volume'
+];
 
 const CMO_PEOPLE = [
   { key:'nick',    name:'Nick',    role:'Search & Social',              cls:'bl',  color:'var(--accent)' },
@@ -754,44 +773,46 @@ Let's make it count`;
 
 function getRitualStepHTML(step) {
   if (step === 1) {
-    const saved = ritualData.lastIntent || LAST_WEEK_INTENT;
+    const lastAccomplish = ritualData.teamAccomplish.length ? ritualData.teamAccomplish : LAST_WEEK_ACCOMPLISH;
+    const refItems = lastAccomplish.map(t => `<div style="display:flex;align-items:flex-start;gap:6px;padding:4px 0;"><span style="color:var(--text3);margin-top:1px;">·</span><span style="font-size:12.5px;color:var(--text2);line-height:1.5;">${t}</span></div>`).join('');
+    const acList = ritualData.accomplishments.map((t,i) => `<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12.5px;color:var(--text);flex:1;">${t}</span><button onclick="removeAccomplishment(${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`).join('');
     return `<div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">LAST WEEK'S INTENT</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Review what you set out to do. How did the team land?</div>
-      <textarea id="r-last-intent" style="width:100%;min-height:130px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;line-height:1.6;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.lastIntent=this.value;saveRitualDraft()">${saved}</textarea>
-      <div style="margin-top:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;">HOW DID WE LAND?</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
-          <div class="result-opt" data-val="delivered" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--green);">✓ Delivered</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">We hit it</div></div>
-          <div class="result-opt" data-val="mostly" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--gold);">~ Mostly</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Close but not all</div></div>
-          <div class="result-opt" data-val="missed" onclick="selResult(this)" style="flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;"><div style="font-size:13px;font-weight:600;color:var(--red);">✗ Missed</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Short of the goal</div></div>
-        </div>
-        <textarea id="r-result-note" style="width:100%;min-height:52px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:none;outline:none;" placeholder="One line on why (optional)..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.lastResultNote=this.value;saveRitualDraft()">${ritualData.lastResultNote||''}</textarea>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">LAST WEEK'S GOALS — REFERENCE</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px;display:flex;flex-direction:column;gap:2px;">${refItems}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">WHAT WE ACCOMPLISHED / MISSED</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Add bullets — wins and misses. These open the Slack message.</div>
+      <div id="r-ac-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">${acList}</div>
+      <div style="display:flex;gap:5px;margin-bottom:14px;">
+        <input id="r-ac-input" placeholder="e.g. Built momentum on Amazon..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addAccomplishment();}">
+        <button onclick="addAccomplishment()" style="padding:7px 12px;border-radius:6px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">+</button>
       </div>
     </div>`;
   }
   if (step === 2) {
+    const ownList = ritualData.ownItems.map((t,i)=>`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12.5px;color:var(--text);flex:1;">${t}</span><button onclick="removeRitualItem('own',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`).join('');
+    const teamList = ritualData.teamItems.map((t,i)=>{
+      const p = CMO_PEOPLE.find(p=>p.key===t.person)||CMO_PEOPLE[0];
+      return `<div style="display:flex;align-items:center;gap:6px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(62,207,142,.12);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;color:${p.color};flex-shrink:0;">${p.name[0]}</div><span style="font-size:12.5px;color:var(--text);flex:1;">${t.text}</span><button onclick="removeRitualItem('team',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`;
+    }).join('');
     return `<div>
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">THIS WEEK'S INTENT</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Set the directive. One clear message that tells the team what this week is about.</div>
-      <textarea id="r-intent" style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="e.g. This week is about closing the gap on Walmart..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.thisIntent=this.value;saveRitualDraft()">${ritualData.thisIntent||''}</textarea>
+      <textarea id="r-intent" style="width:100%;min-height:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none;" placeholder="The directive — what this week is about for the team..." onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" oninput="ritualData.thisIntent=this.value;saveRitualDraft()">${ritualData.thisIntent||''}</textarea>
       <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:6px;">I OWN</div>
-          <div id="r-own-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ritualData.ownItems.map((t,i)=>`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12.5px;color:var(--text);flex:1;">${t}</span><button onclick="removeRitualItem('own',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`).join('')}</div>
-          <div style="display:flex;gap:5px;"><input id="r-own-input" placeholder="Add item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('own');}"><button onclick="addRitualItem('own')" style="padding:6px 10px;border-radius:6px;background:var(--accent);border:none;color:white;font-size:12px;cursor:pointer;">+</button></div>
-        </div>
-        <div>
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.06em;margin-bottom:6px;">TEAM OWNS (I SUPPORT)</div>
-          <div id="r-team-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ritualData.teamItems.map((t,i)=>{
-            const p = CMO_PEOPLE.find(p=>p.key===t.person)||CMO_PEOPLE[0];
-            return `<div style="display:flex;align-items:center;gap:6px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(62,207,142,.12);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;color:${p.color};flex-shrink:0;">${p.name[0]}</div><span style="font-size:12.5px;color:var(--text);flex:1;">${t.text}</span><button onclick="removeRitualItem('team',${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 2px;">✕</button></div>`;
-          }).join('')}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.06em;margin-bottom:6px;">WHAT TO ACCOMPLISH</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Team guidance · becomes Slack bullets · saved for next week's review</div>
+          <div id="r-team-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${teamList}</div>
           <div style="display:flex;gap:5px;">
-            <select id="r-team-person" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;flex-shrink:0;">${CMO_PEOPLE.map(p=>`<option value="${p.key}">${p.name}</option>`).join('')}</select>
-            <input id="r-team-input" placeholder="Add item..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('team');}">
+            <select id="r-team-person" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:11px;outline:none;flex-shrink:0;">${CMO_PEOPLE.map(p=>`<option value="${p.key}">${p.name}</option>`).join('')}</select>
+            <input id="r-team-input" placeholder="Add goal..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('team');}">
             <button onclick="addRitualItem('team')" style="padding:6px 10px;border-radius:6px;background:var(--green);border:none;color:#0d0f14;font-size:12px;cursor:pointer;">+</button>
           </div>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:6px;">MY WEEKLY TASKS</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">What you own · pins to top of Priorities tab</div>
+          <div id="r-own-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">${ownList}</div>
+          <div style="display:flex;gap:5px;"><input id="r-own-input" placeholder="Add task..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12.5px;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addRitualItem('own');}"><button onclick="addRitualItem('own')" style="padding:6px 10px;border-radius:6px;background:var(--accent);border:none;color:white;font-size:12px;cursor:pointer;">+</button></div>
         </div>
       </div>
     </div>`;
@@ -805,20 +826,16 @@ function getRitualStepHTML(step) {
 }
 
 function buildSlackStep() {
-  const lastResult = ritualData.lastResult;
-  const resultMap = { delivered:'We delivered on it.', mostly:'We mostly got there.', missed:'We fell short of the goal.' };
-  const resultLine = lastResult ? resultMap[lastResult] : '';
-  const note = ritualData.lastResultNote ? ` ${ritualData.lastResultNote}` : '';
-  const ownBullets = ritualData.ownItems.map(t => `* ${t}`).join('\n');
-  const teamBullets = ritualData.teamItems.map(t => `* ${t}`).join('\n');
-  const allBullets = [...ritualData.ownItems, ...ritualData.teamItems.map(t=>t.text)].map(t => `* ${t}`).join('\n');
+  const acBullets = ritualData.accomplishments.map(t => `* ${t}`).join('\n');
+  const teamBullets = ritualData.teamItems.map(t => `* ${t.text}`).join('\n');
   const intent = ritualData.thisIntent || '';
-  const recap = resultLine ? `Last week — ${resultLine}${note}\n\n` : '';
-  const draft = `Team,\n\n${recap}${intent}\n\n${allBullets ? allBullets + '\n\n' : ''}Let's make it count`;
+  const acSection = acBullets ? `What we accomplished / missed:\n${acBullets}\n\n` : '';
+  const teamSection = teamBullets ? `What to accomplish:\n${teamBullets}\n\n` : '';
+  const draft = `Team,\n\n${acSection}${intent ? intent + '\n\n' : ''}${teamSection}Let's make it count`;
   return `<div>
     <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:6px;letter-spacing:.06em;">MONDAY SLACK MESSAGE</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Auto-drafted from your intent and priorities. Edit freely — this is your voice.</div>
-    <textarea id="r-slack" style="width:100%;min-height:200px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${draft}</textarea>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Auto-drafted from your review and priorities. Edit freely — this is your voice.</div>
+    <textarea id="r-slack" style="width:100%;min-height:220px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">${draft}</textarea>
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button onclick="copyRitualSlack()" style="flex:1;padding:9px;border-radius:7px;background:var(--gold);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer;">📋 Copy Message</button>
       <button onclick="saveRitualSlackToHistory()" style="padding:9px 14px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;cursor:pointer;">💾 Save to History</button>
@@ -876,8 +893,25 @@ function buildCmoStep() {
   </div>`;
 }
 
+function addAccomplishment() {
+  const input = document.getElementById('r-ac-input');
+  if (!input) return;
+  const val = input.value.trim(); if (!val) return;
+  ritualData.accomplishments.push(val);
+  input.value = '';
+  saveRitualDraft();
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(1);
+  document.getElementById('r-ac-input')?.focus();
+}
+
+function removeAccomplishment(idx) {
+  ritualData.accomplishments.splice(idx, 1);
+  saveRitualDraft();
+  document.getElementById('ritual-content').innerHTML = getRitualStepHTML(1);
+}
+
 function saveRitualDraft() {
-  try { localStorage.setItem('cmo_ritual_draft', JSON.stringify({ step: ritualStep, data: { lastIntent: ritualData.lastIntent, lastResult: ritualData.lastResult, lastResultNote: ritualData.lastResultNote, thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems } })); } catch(e) {}
+  try { localStorage.setItem('cmo_ritual_draft', JSON.stringify({ step: ritualStep, data: { lastIntent: ritualData.lastIntent, lastResult: ritualData.lastResult, lastResultNote: ritualData.lastResultNote, accomplishments: ritualData.accomplishments, teamAccomplish: ritualData.teamAccomplish, thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems } })); } catch(e) {}
 }
 
 function restoreRitualDraft() {
@@ -1008,6 +1042,8 @@ function startSundayRitual() {
   ritualStep = 1;
   const savedRitual = (() => { try { return JSON.parse(localStorage.getItem('cmo_ritual_v2') || 'null'); } catch(e) { return null; } })();
   ritualData.lastIntent = (savedRitual?.thisIntent) || LAST_WEEK_INTENT;
+  ritualData.teamAccomplish = savedRitual?.teamAccomplish || LAST_WEEK_ACCOMPLISH;
+  ritualData.accomplishments = [];
   ritualData.lastResult = '';
   ritualData.lastResultNote = '';
   ritualData.thisIntent = '';
@@ -1076,7 +1112,7 @@ function removeNewCmoItem(personKey, idx) {
 
 function finalizeRitual() {
   // Save ritual data for next week's Step 1
-  try { localStorage.setItem('cmo_ritual_v2', JSON.stringify({ thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems })); } catch(e) {}
+  try { localStorage.setItem('cmo_ritual_v2', JSON.stringify({ thisIntent: ritualData.thisIntent, ownItems: ritualData.ownItems, teamItems: ritualData.teamItems, teamAccomplish: ritualData.teamItems.map(t=>t.text) })); } catch(e) {}
 
   // Inject NEW team items into each person's CMO box with NEW badge
   CMO_PEOPLE.forEach(person => {
