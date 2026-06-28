@@ -24,7 +24,7 @@
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.18 · 2026-06-28 18:08 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.16 · 2026-06-28 18:00 UTC</span>
   </div>
 </div>
 
@@ -42,6 +42,16 @@
 
 <!-- ════════════════════ PRIORITIES -->
 <div id="tab-priorities" class="tab-content active">
+  <!-- THIS WEEK'S FOCUS (pinned, hidden until ritual runs) -->
+  <div class="card" id="weekly-focus-card" style="display:none;margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-title">🎯 This Week's Focus</div>
+      <div class="week-label-display" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);"></div>
+    </div>
+    <div style="padding:10px 16px 14px;">
+      <div id="weekly-focus-items" style="display:flex;flex-direction:column;"></div>
+    </div>
+  </div>
   <div class="grid-2">
     <div class="col">
 
@@ -53,17 +63,7 @@
         <div class="pin-item"><div class="pin-icon">◈</div><div><div class="pin-label">Support Large &amp; Small Format initiatives that move the needle — review weekly.</div><span class="pin-tag wk">Weekly Check</span></div></div>
       </div>
 
-      <!-- THIS WEEK'S FOCUS (pinned, hidden until ritual runs) -->
-      <div class="card" id="weekly-focus-card" style="display:none;">
-        <div class="card-header">
-          <div class="card-title">🎯 This Week's Focus</div>
-          <div class="week-label-display" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);"></div>
-        </div>
-        <div style="padding:10px 16px 14px;">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:.06em;margin-bottom:8px;">DOUBLE-CLICK ANY ITEM TO EDIT</div>
-          <div id="weekly-focus-items" style="display:flex;flex-direction:column;"></div>
-        </div>
-      </div>
+      <!-- MY PRIORITIES -->
       <div class="card" id="priorities-card">
         <div class="card-header">
           <div class="card-title">My Priorities</div>
