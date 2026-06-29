@@ -232,7 +232,7 @@ async function saveState() {
     });
     const doneLabels = new Set(Array.from(document.getElementById('done-list')?.querySelectorAll('.task-label')||[]).map(el=>el.textContent.trim()));
     const state = {zones:{},done:[],doneOpen:document.getElementById('done-list')?.style.display!=='none'};
-    ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
+    ['zone-today','zone-week','zone-long','zone-waiting','zone-personal'].forEach(zid => {
       const zone = document.getElementById(zid); if (!zone) return;
       state.zones[zid] = Array.from(zone.querySelectorAll('.task-item.draggable')).filter(item => {
         const label = item.querySelector('.task-label')?.textContent?.trim();
@@ -362,7 +362,7 @@ function applyState(state) {
       return tmp.querySelector('.task-label')?.textContent?.trim() || '';
     }));
     if (state.zones) {
-      ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
+      ['zone-today','zone-week','zone-long','zone-waiting','zone-personal'].forEach(zid => {
         const zone = document.getElementById(zid);
         if (!zone) return;
         if (!state.zones[zid] || !state.zones[zid].length) { zone.querySelectorAll('.task-item.draggable').forEach(el => el.remove()); return; }
@@ -1428,7 +1428,24 @@ function cmoItemDrop(btn) {
   setTimeout(() => { wrap.remove(); saveState(); }, 210);
 }
 
-// ── NEW INBOX: TAG → PUSH ─────────────────────────────────
+function addPersonalTask() {
+  const input = document.getElementById('personal-input');
+  if (!input) return;
+  const text = input.value.trim(); if (!text) return;
+  const zone = document.getElementById('zone-personal');
+  if (!zone) return;
+  const item = createDraggableTask(text.replace(/</g,'&lt;'), '', 'personal');
+  zone.appendChild(item);
+  input.value = '';
+  updatePersonalCount();
+  saveState();
+}
+
+function updatePersonalCount() {
+  const n = document.querySelectorAll('#zone-personal .task-item.draggable').length;
+  const el = document.getElementById('personal-count');
+  if (el) el.textContent = n + ' task' + (n !== 1 ? 's' : '');
+}
 function updateInboxCount() {
   const n = document.querySelectorAll('#inbox-queue .inbox-item').length;
   const el = document.getElementById('inbox-count');
@@ -1473,7 +1490,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const doneList = document.getElementById('done-list');
   if (doneList) doneList.innerHTML = '';
   // Clear hardcoded tasks from zones before restoring
-  ['zone-today','zone-week','zone-long','zone-waiting'].forEach(zid => {
+  ['zone-today','zone-week','zone-long','zone-waiting','zone-personal'].forEach(zid => {
     const zone = document.getElementById(zid);
     if (zone) zone.querySelectorAll('.task-item.draggable').forEach(el => el.remove());
   });
