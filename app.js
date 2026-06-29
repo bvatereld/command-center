@@ -254,6 +254,10 @@ async function saveState() {
     document.querySelectorAll('#tab-team [contenteditable]').forEach((el, i) => {
       teamBoxes[el.id || `team-box-${i}`] = el.innerHTML;
     });
+    // Save CMO focus boxes by person key
+    document.querySelectorAll('.cmo-box[data-person]').forEach(box => {
+      teamBoxes[`cmo-${box.dataset.person}`] = box.innerHTML;
+    });
     state.teamBoxes = teamBoxes;
 
     // Save Inbox queue
@@ -304,11 +308,17 @@ async function restoreState() {
     }
   }
 
-  // Restore Team tab contenteditable boxes
+  // Restore Team tab contenteditable boxes + CMO focus boxes
   if (state.teamBoxes) {
     Object.entries(state.teamBoxes).forEach(([id, html]) => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = html;
+      if (id.startsWith('cmo-')) {
+        const person = id.replace('cmo-', '');
+        const box = document.querySelector(`.cmo-box[data-person="${person}"]`);
+        if (box) box.innerHTML = html;
+      } else {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+      }
     });
   }
 
@@ -328,7 +338,7 @@ async function restoreState() {
   }
 
   // Restore Slack draft
-  if (state.slackDraft && state.slackDraft.trim().length > 20) {
+  if (state.slackDraft && state.slackDraft.trim().length > 20 && !state.slackDraft.includes('Run the Sunday Ritual')) {
     const draft = document.getElementById('slack-draft');
     if (draft) draft.value = state.slackDraft;
   }
