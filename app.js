@@ -328,7 +328,7 @@ async function restoreState() {
   }
 
   // Restore Slack draft
-  if (state.slackDraft) {
+  if (state.slackDraft && state.slackDraft.trim().length > 20) {
     const draft = document.getElementById('slack-draft');
     if (draft) draft.value = state.slackDraft;
   }
@@ -1410,11 +1410,12 @@ function cmoItemKeep(btn) {
   const wrap = btn.closest('.cmo-item-wrap');
   wrap.style.opacity = '.45';
   btn.textContent = '✓'; btn.style.background = 'rgba(62,207,142,.15)';
+  saveState();
 }
 function cmoItemDrop(btn) {
   const wrap = btn.closest('.cmo-item-wrap');
   wrap.style.transition = 'all .2s'; wrap.style.opacity = '0'; wrap.style.height = '0'; wrap.style.overflow = 'hidden'; wrap.style.padding = '0';
-  setTimeout(() => { wrap.remove(); }, 210);
+  setTimeout(() => { wrap.remove(); saveState(); }, 210);
 }
 
 // ── NEW INBOX: TAG → PUSH ─────────────────────────────────
