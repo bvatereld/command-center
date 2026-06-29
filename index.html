@@ -24,7 +24,7 @@
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.21 · 2026-06-29 12:30 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.22 · 2026-06-29 13:00 UTC</span>
   </div>
 </div>
 
@@ -42,20 +42,6 @@
 
 <!-- ════════════════════ PRIORITIES -->
 <div id="tab-priorities" class="tab-content active">
-  <!-- THIS WEEK'S FOCUS (pinned, hidden until ritual runs) -->
-  <div class="card" id="weekly-focus-card" style="margin-bottom:14px;">
-    <div class="card-header">
-      <div class="card-title">🎯 This Week's Focus</div>
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">Week of Jun 28</div>
-    </div>
-    <div style="padding:10px 16px 14px;">
-      <div id="weekly-focus-items" style="display:flex;flex-direction:column;">
-        <div class="focus-item"><span class="focus-dot"></span><span class="focus-text">Target On site push</span></div>
-        <div class="focus-item"><span class="focus-dot"></span><span class="focus-text">Incremental Budget ask</span></div>
-        <div class="focus-item"><span class="focus-dot"></span><span class="focus-text">Costco push</span></div>
-      </div>
-    </div>
-  </div>
   <div class="grid-2">
     <div class="col">
 
@@ -65,6 +51,21 @@
         <div class="pin-item"><div class="pin-icon">◈</div><div><div class="pin-label">Velocity across all 4 categories — North star. Measurable via Amazon revenue growth + digital penetration at key retailers.</div><span class="pin-tag ns">North Star</span></div></div>
         <div class="pin-item"><div class="pin-icon">◈</div><div><div class="pin-label">Drive double-digit YoY growth on Amazon — Consideration &amp; Conversion funnel first. Replicate playbook to Walmart.</div><span class="pin-tag amz">Amazon → Walmart</span></div></div>
         <div class="pin-item"><div class="pin-icon">◈</div><div><div class="pin-label">Support Large &amp; Small Format initiatives that move the needle — review weekly.</div><span class="pin-tag wk">Weekly Check</span></div></div>
+      </div>
+
+      <!-- THIS WEEK'S FOCUS -->
+      <div class="card" id="weekly-focus-card" style="margin-bottom:14px;">
+        <div class="card-header">
+          <div class="card-title">🎯 This Week's Focus</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">Week of Jun 28</div>
+        </div>
+        <div style="padding:10px 16px 14px;">
+          <div id="weekly-focus-items" style="display:flex;flex-direction:column;">
+            <div class="focus-item"><span class="focus-dot"></span><span class="focus-text">Target On site push</span></div>
+            <div class="focus-item"><span class="focus-dot"></span><span class="focus-text">Incremental Budget ask</span></div>
+            <div class="focus-item"><span class="focus-dot"></span><span class="focus-text">Costco push</span></div>
+          </div>
+        </div>
       </div>
 
       <!-- MY PRIORITIES -->
