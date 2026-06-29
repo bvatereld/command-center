@@ -24,7 +24,7 @@
     <button class="tb-btn" onclick="location.reload()" title="Refresh dashboard">↺ Refresh</button>
     <button class="tb-btn gold" onclick="document.getElementById('bdModal').classList.add('open')">🧠 Brain Dump</button>
     <button class="tb-btn" onclick="exportZip()">↓ Backup</button>
-    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.22 · 2026-06-29 13:00 UTC</span>
+    <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;">v5.3.21 · 2026-06-29 12:30 UTC</span>
   </div>
 </div>
 
@@ -180,11 +180,12 @@
 
       <!-- PERSONAL -->
       <div class="card">
-        <div class="card-header"><div class="card-title">🌿 Personal &amp; Wellbeing</div><div class="card-count">0 tasks</div></div>
+        <div class="card-header"><div class="card-title">🌿 Personal &amp; Wellbeing</div><div class="card-count" id="personal-count">0 tasks</div></div>
         <div class="h-header h-personal"><div class="h-dot"></div><div class="h-label">Personal</div></div>
-        <div style="padding:24px 16px;text-align:center;color:var(--text3);font-size:13px;">
-          <div style="font-size:22px;margin-bottom:6px;">🌿</div>No personal items yet.
-          <br><button class="fmt-add" style="margin-top:12px;">+ Add item</button>
+        <div class="drop-zone" id="zone-personal" data-zone="personal"></div>
+        <div class="task-input-row" style="padding:8px 12px;display:flex;gap:6px;">
+          <input id="personal-input" class="task-input" placeholder="Add personal task..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addPersonalTask();}">
+          <button onclick="addPersonalTask()" style="padding:7px 12px;border-radius:6px;background:var(--green);border:none;color:#0d0f14;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">+</button>
         </div>
       </div>
     </div>
